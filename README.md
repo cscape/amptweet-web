@@ -2,7 +2,12 @@
 
 AmpTweet is a project made to bring a high standard of Twitter management to the public ― free!
 
-## todo
-- add a license
-- start the project
-- etc.
+## About Mirroring
+
+**Please do not open pull requests on GitHub.** Currently, only merge requests will be accepted on GitLab.
+
+This project is currently hosted on GitLab and continuously mirrored on GitHub.
+
+**Why?** It allows for easier discovery of the project and many free development services are available only to GitHub users.
+Mirroring the project on GitHub allows for using CI and deployment services not available on GitLab.
+This reduces the costs necessary to maintain the project and keeps it free.
