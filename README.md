@@ -1,4 +1,4 @@
-# AmpTweet [![Build Status](https://www.bitrise.io/app/dbbcddd2536e0248/status.svg?token=cw7O2wKQdMdSWbrcdbo3jw)](https://www.bitrise.io/app/dbbcddd2536e0248)
+# AmpTweet [![Build Status](https://www.bitrise.io/app/dbbcddd2536e0248/status.svg?token=cw7O2wKQdMdSWbrcdbo3jw)](https://www.bitrise.io/app/dbbcddd2536e0248) [![CircleCI](https://circleci.com/gh/amptweet/amptweet-web.svg?style=svg)](https://circleci.com/gh/amptweet/amptweet-web)
 
 AmpTweet is a project made to bring a high standard of Twitter management to the public ― free!
 
