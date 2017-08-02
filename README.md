@@ -2,6 +2,8 @@
 
 AmpTweet is a project made to bring a high standard of Twitter management to the public ― free!
 
+The testing server is publicly accessible **[here](https://amptweet.herokuapp.com)**.
+
 ## About Mirroring
 
 **Please do not open pull requests on GitHub.** Currently, only merge requests will be accepted on GitLab.
@@ -19,4 +21,4 @@ GitLab's remote repository push feature is too slow and a faster, more reliable 
 
 ## License
 
-ISC (fret not! It's very similar to the MIT license)
+ISC
