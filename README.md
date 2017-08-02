@@ -12,6 +12,11 @@ This project is currently hosted on GitLab and continuously mirrored on GitHub.
 Mirroring the project on GitHub allows for using CI and deployment services not available on GitLab.
 This reduces the costs necessary to maintain the project and keeps it free.
 
+**How?** The project is being mirrored using a proprietary Node.js package created by @ciolt which uses GitLab webhooks to do a one-directional sync to GitHub.
+A bi-directional sync may be considered in the future, but is not necessary as of right now.
+GitLab's remote repository push feature is too slow and a faster, more reliable method was needed.
+
+
 ## License
 
 ISC (fret not! It's very similar to the MIT license)
