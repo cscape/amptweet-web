@@ -1,18 +1,28 @@
 {
   "name": "amptweet-web",
   "version": "0.0.1",
+  "description": "Social, done right.",
+  "homepage": "https://gitlab.com/amptweet/amptweet-web",
+  "keywords": [
+      "free software", "javascript", "nodejs", "social media", "twitter"
+  ],
+  "bugs": {
+      "url": "https://gitlab.com/amptweet/amptweet-web/issues"
+  },
+  "repository": "gitlab:amptweet/amptweet-web",
+  "license": "ISC",
   "private": false,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "body-parser": "~1.17.1",
-    "cookie-parser": "~1.4.3",
+    "body-parser": "^1.17.1",
+    "cookie-parser": "^1.4.3",
     "debug": "~2.6.3",
-    "express": "~4.15.2",
+    "express": "^4.15.2",
     "morgan": "~1.8.1",
-    "pug": "~2.0.0-beta11",
-    "serve-favicon": "~2.4.2",
-    "stylus": "0.54.5"
+    "pug": "^2.0.0-beta11",
+    "serve-favicon": "^2.4.2",
+    "stylus": "^0.54.5"
   }
 }
