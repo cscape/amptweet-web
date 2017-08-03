@@ -21,8 +21,8 @@ router.get('/twitter/redirect', function(req, res) {
   
   TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
     TwitterAuth.authURL = 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' + OAuthToken;
-    res.sendStatus(302); // HTTP Redirect - 302 Found
-    res.append("Location", TwitterAuth.authURL);
+    res.status(302) // HTTP Redirect - 302 Found
+      .append("Location", TwitterAuth.authURL);
     res.end();
   });
 });
