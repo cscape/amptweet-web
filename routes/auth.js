@@ -32,20 +32,4 @@ router.all('/twitter/callback', function(req, res) {
   res.end();
 });
 
-router.get('/', function(req, res) {
-  res.sendStatus(302); // HTTP Redirect - 302 Found
-  res.render('error', {
-    title: 'AmpTweet',
-    message: "302",
-    error: {
-      status: "This URL is not accessible, redirecting to homepage..."
-    }
-  });
-
-  setTimeout(() => {
-    res.append("Location", req.protocol + '://' + req.get('host'));
-    res.end();
-  }, 4000);
-});
-
 module.exports = router;
