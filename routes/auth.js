@@ -89,7 +89,7 @@ router.all('/twitter/callback', function(req, res) {
               }
             )
             .cookie('twitter_user_id',
-              twitterResponseData.id, {
+              JSON.parse(twitterResponseData).id, {
                 expires: 0, // session cookie
                 httpOnly: false
               }
