@@ -3,7 +3,8 @@ let OAuth = require('oauth').OAuth;
 
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
-let callback_url = 'https://amptweet.herokuapp.com/auth/twitter/callback';
+let rootURL = 'https://amptweet.herokuapp.com'
+let callback_url = rootURL + '/auth/twitter/callback';
 
 let router = express.Router();
 
@@ -43,7 +44,7 @@ router.all('/twitter/callback', function(req, res) {
             status: "",
             stack: error
           }
-        }).end();
+        });
         return false;
       }
 
@@ -59,7 +60,7 @@ router.all('/twitter/callback', function(req, res) {
                 status: "",
                 stack: error
               }
-            }).end();
+            });
             return;
           }
           try {
@@ -72,9 +73,29 @@ router.all('/twitter/callback', function(req, res) {
                 status: "",
                 stack: parseError
               }
-            }).end();
+            });
           }
-          res.end(twitterResponseData);
+
+          res.status(302)
+            .cookie('twitter_session_token',
+              Buffer.from(
+                JSON.stringify({
+                  "access_token": OAuthAccessToken,
+                  "access_token_secret": OAuthAccessTokenSecret
+                })
+              ).toString('base64'), {
+                expires: 0, // session cookie
+                httpOnly: true
+              }
+            )
+            .cookie('twitter_user_id',
+              twitterResponseData.id, {
+                expires: 0, // session cookie
+                httpOnly: false
+              }
+            )
+            .append("Location", rootURL)
+            .end();
         });
     }
   );
