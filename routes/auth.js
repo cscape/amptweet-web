@@ -6,7 +6,8 @@ let OAuth = require('oauth').OAuth;
  */
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
-let callback_url = process.env.TWITTER_CALLBACK_URL || 'https://amptweet.herokuapp.com/auth/twitter/callback';
+let callback_url = process.env.TWITTER_CALLBACK_URL || (
+  'https://amptweet.herokuapp.com/auth/twitter/callback');
 
 let router = express.Router();
 
