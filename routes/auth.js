@@ -22,7 +22,7 @@ router.get('/twitter/redirect', function(req, res) {
   TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
     TwitterAuth.data = {
       OAuthToken: OAuthToken,
-      OAuthTokenSecret: OAuthToken,
+      OAuthTokenSecret: OAuthTokenSecret,
       authURL: 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' + OAuthToken
     };
     res.status(302) // HTTP Redirect - 302 Found
