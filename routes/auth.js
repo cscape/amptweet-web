@@ -1,9 +1,6 @@
 let express = require('express');
 let OAuth = require('oauth').OAuth;
 
-/* Twitter for Windows Phone keys are used as a backfill
- * in case the environment variables are not present.
- */
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
 let callback_url = 'https://amptweet.herokuapp.com/auth/twitter/callback';
