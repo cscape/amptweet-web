@@ -25,8 +25,6 @@ router.get('/twitter/redirect', function(req, res) {
     res.append("Location", TwitterAuth.authURL);
     res.end();
   });
-  
-  res.send('respond with a resource');
 });
 
 router.all('/twitter/callback', function(req, res) {
