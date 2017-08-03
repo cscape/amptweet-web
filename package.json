@@ -12,6 +12,9 @@
   "repository": "gitlab:amptweet/amptweet-web",
   "license": "ISC",
   "private": false,
+  "engines" : {
+      "node" : ">=7.1"
+  },
   "scripts": {
     "start": "node app.js"
   },
