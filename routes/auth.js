@@ -28,8 +28,51 @@ router.get('/twitter/redirect', function(req, res) {
 });
 
 router.all('/twitter/callback', function(req, res) {
-  res.send(req.headers);
-  res.end();
+  TwitterAuth.getOAuthAccessToken(req.query.oauth_token, oAuthTokenSecret, req.query.oauth_verifier,
+    function (error, oAuthAccessToken, oAuthAccessTokenSecret, results) {
+      if (error) {
+        res.render('error', {
+          title: 'AmpTweet',
+          message: 'Error occured while getting access token',
+          error: {
+            status: "",
+            stack: error
+          }
+        }).end();
+        return false;
+      }
+
+      TwitterAuth.get('https://api.twitter.com/1.1/account/verify_credentials.json',
+        oAuthAccessToken,
+        oAuthAccessTokenSecret,
+        function (error, twitterResponseData, result) {
+          if (error) {
+            res.render('error', {
+              title: 'AmpTweet',
+              message: 'Error occured while verifying credentias',
+              error: {
+                status: "",
+                stack: error
+              }
+            }).end();
+            return;
+          }
+          try {
+            JSON.parse(twitterResponseData);
+          } catch (parseError) {
+            res.render('error', {
+              title: 'AmpTweet',
+              message: 'Error occured while parsing Twitter response data',
+              error: {
+                status: "",
+                stack: parseError
+              }
+            }).end();
+          }
+          response.end(twitterResponseData);
+        });
+    }
+  );
 });
 
 module.exports = router;
