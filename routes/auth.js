@@ -19,17 +19,22 @@ let TwitterAuth = new OAuth(
 
 /* Listen for GET on /auth/twitter/redirect */
 router.get('/twitter/redirect', function(req, res) {
-  TwitterAuth.getOAuthRequestToken(function (error, oAuthToken, oAuthTokenSecret, results) {
-    TwitterAuth.authURL = 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' + oAuthToken;
+  TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
+    TwitterAuth.data = {
+      OAuthToken: OAuthToken,
+      OAuthTokenSecret: OAuthToken,
+      authURL: 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' + OAuthToken
+    };
     res.status(302) // HTTP Redirect - 302 Found
-      .append("Location", TwitterAuth.authURL);
+      .append("Location", TwitterAuth.data.authURL);
     res.end();
   });
 });
 
 router.all('/twitter/callback', function(req, res) {
-  TwitterAuth.getOAuthAccessToken(req.query.oauth_token, oAuthTokenSecret, req.query.oauth_verifier,
-    function (error, oAuthAccessToken, oAuthAccessTokenSecret, results) {
+  TwitterAuth.getOAuthAccessToken(req.query.oauth_token, 
+    TwitterAuth.data.OAuthTokenSecret, req.query.oauth_verifier,
+    function (error, OAuthAccessToken, OAuthAccessTokenSecret, results) {
       if (error) {
         res.render('error', {
           title: 'AmpTweet',
@@ -43,8 +48,8 @@ router.all('/twitter/callback', function(req, res) {
       }
 
       TwitterAuth.get('https://api.twitter.com/1.1/account/verify_credentials.json',
-        oAuthAccessToken,
-        oAuthAccessTokenSecret,
+        OAuthAccessToken,
+        OAuthAccessTokenSecret,
         function (error, twitterResponseData, result) {
           if (error) {
             res.render('error', {
