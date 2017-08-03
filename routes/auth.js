@@ -101,4 +101,8 @@ router.all('/twitter/callback', function(req, res) {
   );
 });
 
+
+router.get('/testing', function(req, res) {
+  res.send(req.rawHeaders);
+});
 module.exports = router;
