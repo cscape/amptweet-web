@@ -1,10 +1,17 @@
 let express = require('express');
 let OAuth = require('oauth').OAuth;
 
-let consumer_key = process.env.TWITTER_CONSUMER_KEY;
-let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
+/* Twitter for Windows Phone keys are used as a backfill
+ * in case the environment variables are not present.
+ */
+let consumer_key = process.env.TWITTER_CONSUMER_KEY ||
+  'yN3DUNVO0Me63IAQdhTfCA';
+let consumer_secret = process.env.TWITTER_CONSUMER_SECRET ||
+  'c768oTKdzAjIYCmpSNIdZbGaG0t6rOhSFQP0S5uC79g';
+let callback_url = process.env.TWITTER_CALLBACK_URL || 
+  'https://amptweet.herokuapp.com/auth/twitter/callback';
+
 let router = express.Router();
-let callback_url = req.protocol + '://' + req.get('host') + '/auth/twitter/callback';
 
 let TwitterAuth = new OAuth(
   'https://api.twitter.com/oauth/request_token',
