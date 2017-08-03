@@ -1,5 +1,5 @@
 let express = require('express');
-let OAuth = require('oauth');
+let OAuth = require('oauth').OAuth;
 
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
