@@ -74,7 +74,7 @@ router.all('/twitter/callback', function(req, res) {
               }
             }).end();
           }
-          response.end(twitterResponseData);
+          res.end(twitterResponseData);
         });
     }
   );
