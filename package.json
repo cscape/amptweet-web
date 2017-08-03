@@ -23,6 +23,7 @@
     "morgan": "~1.8.1",
     "pug": "^2.0.0-beta11",
     "serve-favicon": "^2.4.2",
-    "stylus": "^0.54.5"
+    "stylus": "^0.54.5",
+    "oauth": "^0.9.15"
   }
 }
