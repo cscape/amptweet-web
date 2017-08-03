@@ -28,7 +28,7 @@ router.get('/twitter/redirect', function(req, res) {
 });
 
 router.all('/twitter/callback', function(req, res) {
-  res.send(req.body);
+  res.send(req.headers);
   res.end();
 });
 
