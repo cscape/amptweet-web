@@ -4,6 +4,7 @@ let OAuth = require('oauth').OAuth;
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
 let router = express.Router();
+let callback_url = req.protocol + '://' + req.get('host') + '/auth/twitter/callback';
 
 let TwitterAuth = new OAuth(
   'https://api.twitter.com/oauth/request_token',
@@ -11,13 +12,12 @@ let TwitterAuth = new OAuth(
   consumer_key,
   consumer_secret,
   '1.0A',
-  null,
+  callback_url,
   'HMAC-SHA1'
 );
 
 /* Listen for GET on /auth/twitter/redirect */
 router.get('/twitter/redirect', function(req, res) {
-  let callback_url = req.protocol + '://' + req.get('host') + '/auth/twitter/callback';
   
   TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
     TwitterAuth.authURL = 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' + OAuthToken;
