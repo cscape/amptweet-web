@@ -16,14 +16,13 @@ let TwitterAuth = new OAuth(
   'https://api.twitter.com/oauth/access_token',
   consumer_key,
   consumer_secret,
-  '1.0A',
+  '1.0',
   callback_url,
   'HMAC-SHA1'
 );
 
 /* Listen for GET on /auth/twitter/redirect */
 router.get('/twitter/redirect', function(req, res) {
-  
   TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
     TwitterAuth.authURL = 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' + OAuthToken;
     res.status(302) // HTTP Redirect - 302 Found
