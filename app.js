@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var stylus = require('stylus');
+var user_info = require('./middleware/get-user-info.js');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -24,6 +25,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(stylus.middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(user_info);
 
 app.use('/', index);
 app.use('/users', users);
@@ -35,16 +37,22 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
-
+app.use(user_info);
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  let statusCode = err.status || 500;
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  res.status(statusCode)
+    .render('error', {
+      title: "Error",
+      message: err.message,
+      error: {
+        status: statusCode,
+        stack: err.stack
+      }
+    }
+  );
 });
 
 module.exports = app;
