@@ -28,11 +28,12 @@ router.get('/', function(req, res) {
       Session.access_token_secret,
       function (error, data, result) {
         if (!error) {
+          let objdata = JSON.parse(data);
           let user = {
             profile: {
-              avatar: data.profile_image_url_https,
-              name: data.name,
-              username: data.screen_name
+              avatar: objdata.profile_image_url_https,
+              name: objdata.name,
+              username: objdata.screen_name
             }
           };
           res.render('index', {
@@ -40,6 +41,9 @@ router.get('/', function(req, res) {
             user
           });
         } else {
+          console.log(error);
+          console.log(data);
+          console.log(result);
           res.render('error', {
             title: 'AmpTweet',
             message: 'Error',
