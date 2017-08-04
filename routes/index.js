@@ -37,12 +37,12 @@ router.get('/', function(req, res) {
           };
           res.render('index', {
             title: `AmpTweet`,
-            user: user
+            user
           });
         } else {
           res.render('error', {
             title: 'AmpTweet',
-            message: 'Error occured while getting access token',
+            message: 'Error',
             error: {
               status: "",
               stack: new Error(error)

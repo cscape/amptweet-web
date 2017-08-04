@@ -6,7 +6,7 @@ html
   body
     block header
       header
-        if user.profile
+        if user
           #accountInfo
             img(height='32px' width='32px' src=user.profile.avatar)
             h2=user.profile.name
