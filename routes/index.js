@@ -1,4 +1,5 @@
 var express = require('express');
+var OAuth = require('oauth').OAuth;
 var router = express.Router();
 
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
