@@ -75,7 +75,7 @@ router.all('/twitter/callback', function(req, res) {
               }
             });
           }
-
+          console.log(`AccessToken-> ${OAuthAccessToken}\r\nAccessSecret->${OAuthAccessTokenSecret}`)
           res.status(302)
             .cookie('twitter_session_token',
               Buffer.from(
