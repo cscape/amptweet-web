@@ -3,4 +3,5 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
-  a(href="/auth/twitter/redirect") login with twitter
+  if !user 
+    a(onclick="window.location=\"/auth/twitter/redirect\"") Login with Twitter
