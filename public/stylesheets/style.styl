@@ -1,5 +1,66 @@
-body
-  padding: 50px
-  font: 14px 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif
+:root, body, h1, h2, h3, h4, h5, h6
+    font-family 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif
+
 a
-  color: #00B7FF
+    color #ffc107
+
+.menu-links > .wrapper > .link, .menu-links > .wrapper > .account-info
+    display inline-block
+    margin-right 1rem
+    height 2rem
+    line-height 2rem
+
+.menu-links
+    & > .wrapper
+        float right
+        clear both
+        height 100%
+        padding .5rem 0
+        & > .link
+            a
+                display block
+                height 100%
+                padding 0 1rem
+                font-size 1rem
+                font-weight 500
+        & > *:last-child
+            margin-right 0
+
+.top-bar
+    min-height 3rem
+    background #222
+    color #FAFAFA
+    .account-info
+        max-height 3rem
+        clear both
+        & > .avatarcontainer
+            float left
+            border-radius 100%
+            width 2rem
+            height 2rem
+            overflow hidden
+            & > .avatar
+                float left
+                display block
+                max-height 100%
+                max-width 100%
+        & > .usercontainer
+            margin-left 2.5rem
+            & > .name
+                height 2rem
+                line-height 2rem
+                font-weight 500
+    .nav-bar
+        height 100%
+    & > .nav-bar
+        & > .wrapper
+            height 100%
+
+.nav-bar
+    .branding
+        & > .name
+            font-weight 600
+            letter-spacing -0.03em
+            font-size 1.65rem
+            font-style italic
+            color #FAFAFA
