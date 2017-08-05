@@ -2,13 +2,26 @@ doctype html
 html
   head
     title= title
+    meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
+    link(rel='stylesheet', href='https://cdn.concisecss.com/concise.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/cooper-hewitt.css')
   body
     block header
-      header
-        if user
-          #accountInfo
-            img(height='32px' width='32px' src= user.profile.avatar)
-            h2= user.profile.name
-              small @#{user.profile.username}
-    block content
+      header.top-bar
+        nav.nav-bar(container)
+          .wrapper(grid)
+            .branding(column="center")
+              .name AmpTweet
+            .menu-links(column)
+              .wrapper
+                // .link
+                //   a(href='/') Home
+                if user
+                  .account-info
+                    .avatarcontainer
+                      img.avatar(src=user.profile.avatar)
+                    .usercontainer
+                      .name(title='@#{user.profile.username}')=user.profile.name
+    div(container)
+      block content

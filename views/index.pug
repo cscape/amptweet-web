@@ -1,7 +1,10 @@
 extends layout
 
 block content
-  h1= title
   p Welcome to #{title}
   if !user 
     a(onclick="window.location=\"/auth/twitter/redirect\"") Login with Twitter
+  else
+    span.
+      #[a(href="https://gitlab.com/amptweet") Visit us on the World Wide Web] 
+      and #[a(href="https://twitter.com/AmpTweetSocial") follow us on Twitter!]
