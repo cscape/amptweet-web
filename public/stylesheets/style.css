@@ -1,87 +1,81 @@
-:root, body, h1, h2, h3, h4, h5, h6 {
+:root,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif;
 }
 a {
   color: #ffc107;
 }
-
-.menu-links > .wrapper > .link, .menu-links > .wrapper > .account-info {
-    display: inline-block;
-    margin-right: 1rem;
-    height: 2rem;
-    line-height: 2rem;
+.menu-links > .wrapper > .link,
+.menu-links > .wrapper > .account-info {
+  display: inline-block;
+  margin-right: 1rem;
+  height: 2rem;
+  line-height: 2rem;
 }
-
-.menu-links {
-    /* text-align: right; */
-}
-
 .menu-links > .wrapper {
-    float: right;
-    clear: both;
-    height: 100%;
-    padding: .5rem 0;
+  float: right;
+  clear: both;
+  height: 100%;
+  padding: 0.5rem 0;
 }
-
 .menu-links > .wrapper > .link a {
-    display: block;
-    height: 100%;
-    padding: 0 1rem;
-    font-size: 1rem;
-    font-weight: 500;
-    /* font-style: italic; */
-    /* text-transform: uppercase; */
+  display: block;
+  height: 100%;
+  padding: 0 1rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
-
-.top-bar {
-    min-height: 3rem;
-  background: #222;
-    color: #FAFAFA;
-}
-
-.top-bar .account-info {
-    max-height: 3rem;
-    clear: both;
-}
-
-.top-bar .account-info > .avatarcontainer {
-    float: left;
-    border-radius: 100%;
-    width: 2rem;
-    height: 2rem;
-    overflow: hidden;
-}
-
-.top-bar .account-info > .avatarcontainer >
- .avatar {
-    float: left;
-    display: block;
-    max-height: 100%;
-    max-width: 100%;
-}
-
-.top-bar .account-info > .usercontainer {
-    margin-left: 2.5rem;
-}
-
-.top-bar .nav-bar {
-    height: 100%;
-}
-
-.top-bar > .nav-bar > .wrapper {
-    height: 100%;
-}
-
-.top-bar .account-info > .usercontainer > .name {height: 2rem;line-height: 2rem;font-weight: 500;}
-
 .menu-links > .wrapper > *:last-child {
-    margin-right: 0;
+  margin-right: 0;
 }
-
+.top-bar {
+  min-height: 3rem;
+  background: #222;
+  color: #fafafa;
+}
+.top-bar .account-info {
+  max-height: 3rem;
+  clear: both;
+}
+.top-bar .account-info > .avatarcontainer {
+  float: left;
+  border-radius: 100%;
+  width: 2rem;
+  height: 2rem;
+  overflow: hidden;
+}
+.top-bar .account-info > .avatarcontainer > .avatar {
+  float: left;
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+}
+.top-bar .account-info > .usercontainer {
+  margin-left: 2.5rem;
+}
+.top-bar .account-info > .usercontainer > .name {
+  height: 2rem;
+  line-height: 2rem;
+  font-weight: 500;
+}
+.top-bar .nav-bar {
+  height: 100%;
+  min-height: 3rem;
+}
+.top-bar > .nav-bar > .wrapper {
+  height: 100%;
+  min-height: 3rem;
+}
 .nav-bar .branding > .name {
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    font-size: 1.65rem;
-    font-style: italic;
-    color: #FAFAFA;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-size: 1.65rem;
+  font-style: italic;
+  color: #fafafa;
 }

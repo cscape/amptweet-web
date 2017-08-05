@@ -7,9 +7,9 @@ var bodyParser = require('body-parser');
 var stylus = require('stylus');
 var user_info = require('./middleware/get-user-info.js');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-var auth = require('./routes/auth');
+function pageRoutes (name) {
+  return require(`./routes/${name}`);
+}
 
 var app = express();
 
@@ -27,9 +27,10 @@ app.use(stylus.middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(user_info);
 
-app.use('/', index);
-app.use('/users', users);
-app.use('/auth', auth);
+app.use('/', pageRoutes('index'));
+app.use('/users', pageRoutes('users'));
+app.use('/auth', pageRoutes('auth'));
+app.use('/dashboard', pageRoutes('dash'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -37,7 +38,6 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
-app.use(user_info);
 // error handler
 app.use(function(err, req, res, next) {
   let statusCode = err.status || 500;

@@ -4,12 +4,12 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res) {
   if (req.user) {
-    res.render('index', {
+    res.render('dashboard', {
       title: `AmpTweet`,
       user: req.user
     });
   } else {
-    res.render('index', { title: 'AmpTweet' });
+    throw new Error(404);
   }
 });
 

@@ -90,11 +90,12 @@ router.all('/twitter/callback', function(req, res) {
             )
             .cookie('twitter_user_id',
               JSON.parse(twitterResponseData).id_str, {
-                expires: 0, // session cookie
+                expires: 0, //session cookie
                 httpOnly: false
               }
             )
-            .append("Location", rootURL)
+            // Redirect to dashboard after successful login
+            .append("Location", rootURL + '/dashboard')
             .end();
         });
     }
