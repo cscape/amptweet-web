@@ -1,10 +1,22 @@
 extends layout
 
 block content
-  p Welcome to #{title}
-  if !user 
-    a(onclick="window.location=\"/auth/twitter/redirect\"") Login with Twitter
-  else
-    span.
-      #[a(href="https://gitlab.com/amptweet") Visit us on the World Wide Web] 
-      and #[a(href="https://twitter.com/AmpTweetSocial") follow us on Twitter!]
+  section.hero
+    .inner-hero(container)
+      h1.lead(column="left 10").
+        Grow your Twitter audience. No billing, ever.
+      if !user
+        .calltoaction(column="left")
+          button(type="submit",
+            class="twitter-sign-in mdc-button mdc-button--raised\
+            mdc-button--primary mdc-ripple-surface",
+            onclick="window.location=\"/auth/twitter/redirect\"",
+            data-mdc-auto-init="MDCRipple")
+            | Sign in with Twitter 
+            span.mdi.mdi-arrow-right
+          h6.info
+            span.mdi.mdi-alert-circle-outline
+            |  Currently in alpha testing.
+  div.
+    #[a(href="https://gitlab.com/amptweet") Visit us on the World Wide Web] 
+    and #[a(href="https://twitter.com/AmpTweetSocial") follow us on Twitter!]

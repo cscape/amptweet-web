@@ -1,3 +1,7 @@
+:root {
+  --mdc-theme-primary: #212121;
+  --mdc-theme-accent: #1976d2;
+}
 :root,
 body,
 h1,
@@ -5,7 +9,8 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+.mdc-button {
   font-family: 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif;
 }
 a {
@@ -78,4 +83,58 @@ a {
   font-size: 1.65rem;
   font-style: italic;
   color: #fafafa;
+}
+.hero {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  min-height: 360px;
+  min-height: 20rem;
+  background: rgba(0,0,0,0.17);
+  margin-top: 0;
+  box-sizing: border-box;
+  padding: 3rem 0;
+  position: relative;
+}
+.hero:before {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+  z-index: -2;
+  background-image: url("../images/promo.jpg");
+  background-size: cover;
+  background-position: 20% 20%;
+}
+.hero > .inner-hero > .lead {
+  font-size: 2.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-style: italic;
+  color: #fff;
+  text-shadow: 0.25rem 0.25rem 1.25rem rgba(0,0,0,0.35);
+}
+.hero > .inner-hero > .calltoaction > .twitter-sign-in {
+  background-color: #1da1f2;
+  font-style: italic;
+  font-weight: 500;
+  margin: 0.75rem 0;
+  font-size: 1rem;
+  height: 2.5rem;
+  padding: 0 1.25rem;
+}
+.hero > .inner-hero > .calltoaction > .info {
+  font-weight: 500;
+  opacity: 0.45;
 }
