@@ -3,7 +3,8 @@ let OAuth = require('oauth').OAuth;
 
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
-let rootURL = 'https://amptweet.herokuapp.com'
+let debugStatus = typeof v8debug === 'object';
+let rootURL = debugStatus === false ? 'https://amptweet.herokuapp.com' : 'http://127.0.0.1:3000';
 let callback_url = rootURL + '/auth/twitter/callback';
 
 let router = express.Router();

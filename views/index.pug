@@ -1,6 +1,6 @@
 extends layout
 
-block content
+block content_before
   section.hero
     .inner-hero(container)
       h1.lead(column="left 10").
@@ -17,6 +17,7 @@ block content
           h6.info
             span.mdi.mdi-alert-circle-outline
             |  Currently in alpha testing.
-  div.
-    #[a(href="https://gitlab.com/amptweet") Visit us on the World Wide Web] 
-    and #[a(href="https://twitter.com/AmpTweetSocial") follow us on Twitter!]
+  div(container)
+    div.
+      #[a(href="https://gitlab.com/amptweet") Visit us on the World Wide Web] 
+      and #[a(href="https://twitter.com/AmpTweetSocial") follow us on Twitter!]
