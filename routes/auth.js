@@ -104,9 +104,10 @@ router.all('/twitter/callback', function(req, res) {
 });
 
 router.all('/twitter/logout', function(req, res) {
-  if (!req.user) {
+  if (req.user !== null) {
     res.status(302)
       .append("Location", rootURL + '/')
+      .end();
   } else {
     res.status(200)
       .clearCookie('twitter_user_id')
