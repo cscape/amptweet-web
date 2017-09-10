@@ -1,131 +1,168 @@
-:root
-    --mdc-theme-primary #212121
-    --mdc-theme-accent #1976D2
+:root {
+  --mdc-theme-primary: #212121;
+  --mdc-theme-accent: #1976d2;
+  font-family: 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif;
+}
 
-:root, body, h1, h2, h3, h4, h5, h6, .mdc-button
-    font-family 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif
+body, h1, h2, h3, h4, h5, h6, .mdc-button {
+  font-family: 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif;
+}
 
-a
-    color #ffc107
+a {
+  color: #f4511e;
+}
 
-.menu-links > .wrapper > .link, .menu-links > .wrapper > .account-info
-    display inline-block
-    margin-right 1rem
-    height 2rem
-    line-height 2rem
+.menu-links > .wrapper {
+  > {
+    .link, .account-info {
+      display: inline-block;
+      margin-right: 1rem;
+      height: 2rem;
+      line-height: 2rem;
+    }
+    .link a {
+      display: block;
+      height: 100%;
+      padding: 0 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    *:last-child {
+      margin-right: 0;
+    }
+  }
+  float: right;
+  clear: both;
+  height: 100%;
+  padding: 0.5rem 0;
+  position: relative;
+}
 
-.menu-links
-    & > .wrapper
-        float right
-        clear both
-        height 100%
-        padding .5rem 0
-        position relative
-        & > .link
-            a
-                display block
-                height 100%
-                padding 0 1rem
-                font-size 1rem
-                font-weight 500
-        & > *:last-child
-            margin-right 0
+.top-bar {
+  min-height: 3rem;
+  background: #222;
+  color: #fafafa;
+  .account-info {
+    max-height: 3rem;
+    clear: both;
+    > {
+      .avatarcontainer {
+        float: left;
+        border-radius: 100%;
+        width: 2rem;
+        height: 2rem;
+        overflow: hidden;
+        > .avatar {
+          float: left;
+          display: block;
+          max-height: 100%;
+          max-width: 100%;
+        }
+      }
+      .usercontainer {
+        margin-left: 2.5rem;
+        > .name {
+          height: 2rem;
+          line-height: 2rem;
+          font-weight: 500;
+          color: inherit;
+        }
+      }
+    }
+  }
+  .nav-bar {
+    height: 100%;
+    min-height: 3rem;
+    overflow: visible;
+  }
+  > .nav-bar > .wrapper {
+    height: 100%;
+    min-height: 3rem;
+  }
+}
 
-.top-bar
-    min-height 3rem
-    background #222
-    color #FAFAFA
-    .account-info
-        max-height 3rem
-        clear both
-        & > .avatarcontainer
-            float left
-            border-radius 100%
-            width 2rem
-            height 2rem
-            overflow hidden
-            & > .avatar
-                float left
-                display block
-                max-height 100%
-                max-width 100%
-        & > .usercontainer
-            margin-left 2.5rem
-            & > .name
-                height 2rem
-                line-height 2rem
-                font-weight 500
-    .nav-bar
-        height 100%
-        min-height 3rem
-    & > .nav-bar
-        & > .wrapper
-            height 100%
-            min-height 3rem
+.nav-bar .branding > .name {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-size: 1.65rem;
+  font-style: italic;
+  color: #fafafa;
+}
 
-.nav-bar
-    .branding
-        & > .name
-            font-weight 600
-            letter-spacing -0.03em
-            font-size 1.65rem
-            font-style italic
-            color #FAFAFA
-
-.hero
-    display -webkit-box
-    display -ms-flexbox
-    display flex
-    -webkit-box-orient horizontal
-    -webkit-box-direction normal
-    -ms-flex-flow row nowrap
-    flex-flow row nowrap
-    -webkit-box-align center
-    -ms-flex-align center
-    align-items center
-    -webkit-box-pack center
-    -ms-flex-pack center
-    justify-content center
-    min-height 360px
-    min-height 20rem
-    background: rgba(0, 0, 0, 0.17);
-    margin-top 0
-    box-sizing border-box
-    padding 3rem 0
-    position relative
-
-.hero:before {
+.hero {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  min-height: 360px;
+  min-height: 20rem;
+  background: rgba(0, 0, 0, 0.17);
+  margin-top: 0;
+  box-sizing: border-box;
+  padding: 3rem 0;
+  position: relative;
+  &:before {
     content: '';
     position: absolute;
     height: 100%;
     width: 100%;
-    background-color: #000000;
+    background-color: #000;
     z-index: -2;
-    background-image: url(../images/promo.jpg);
+    background-image: url("../images/promo.jpg");
     background-size: cover;
     background-position: 20% 20%;
+  }
+  > .inner-hero > {
+    .lead {
+      font-size: 2.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-style: italic;
+      color: #fff;
+      text-shadow: 0.25rem 0.25rem 1.25rem rgba(0, 0, 0, 0.35);
+    }
+    .calltoaction > {
+      .twitter-sign-in {
+        background-color: #1da1f2;
+        font-style: italic;
+        font-weight: 500;
+        margin: 0.75rem 0;
+        font-size: 1rem;
+        height: 2.5rem;
+        padding: 0 1.25rem;
+      }
+      .info {
+        font-weight: 500;
+        opacity: 0.45;
+      }
+    }
+  }
 }
 
-.hero > .inner-hero > .lead {
-    font-size: 2.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-style: italic;
-    color: #FFF;
-    text-shadow: 0.25rem 0.25rem 1.25rem rgba(0, 0, 0, 0.35);
-}
-
-.hero > .inner-hero > .calltoaction > .twitter-sign-in {
-    background-color: #1DA1F2;
-    font-style: italic;
+.menu-links > .wrapper > .account-options {
+  background-color: #FAFAFA;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.35);
+  position: absolute;
+  top: 3rem;
+  width: 100%;
+  z-index: 10;
+  display: none;
+  li > a {
+    display: block;
+    padding: 0.25rem 0.5rem;
     font-weight: 500;
-    margin: 0.75rem 0;
-    font-size: 1rem;
-    height: 2.5rem;
-    padding: 0 1.25rem;
-}
-
-.hero > .inner-hero > .calltoaction > .info {
-    font-weight: 500;
-    opacity: 0.45;
+    &:hover {
+      outline: 1px dotted currentColor;
+      outline-offset: -0.25rem;
+    }
+  }
 }
