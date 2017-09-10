@@ -1,3 +1,8 @@
+if user
+  -let logoURL = '/dashboard'
+else
+  -let logoURL = '/' 
+
 doctype html
 html
   head
@@ -17,10 +22,6 @@ html
         nav.nav-bar(container)
           .wrapper(grid)
             .branding(column="center")
-              if user
-                -let logoURL = '/dashboard'
-              else
-                -let logoURL = '/' 
               a.name(href=logoURL) AmpTweet
             if user
               .menu-links(column)
