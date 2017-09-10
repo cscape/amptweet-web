@@ -20,7 +20,7 @@ let TwitterAuth = new OAuth(
 );
 
 /* Listen for GET on /auth/twitter/redirect */
-router.get('/twitter/redirect', function(req, res) {
+router.all('/twitter/redirect', function(req, res) {
   TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
     TwitterAuth.data = {
       OAuthToken: OAuthToken,
@@ -103,6 +103,15 @@ router.all('/twitter/callback', function(req, res) {
   );
 });
 
+router.all('/twitter/logout', function(req, res) {
+  res.status(200)
+    .clearCookie('twitter_user_id')
+    .clearCookie('twitter_session_token')
+    .render('error', {
+      message: "You are now signed out of AmpTweet."
+    })
+    .end();
+});
 
 router.get('/testing', function(req, res) {
   res.send(req.rawHeaders);

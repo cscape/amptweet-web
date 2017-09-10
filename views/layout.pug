@@ -20,16 +20,21 @@ html
               .name AmpTweet
             .menu-links(column)
               .wrapper
-                // .link
-                //   a(href='/') Home
+                //- .link
+                //-   a(href='/') Home
                 if user
                   .account-info
                     .avatarcontainer
                       img.avatar(src=user.profile.avatar)
                     .usercontainer
-                      .name(title='@#{user.profile.username}')=user.profile.name
+                      a.name(title=('@' + user.profile.username), href="#")=user.profile.name
+                  .account-options
+                    ul
+                      li
+                        a(href="/auth/twitter/logout") Sign out
     block content_before
       div(container)
         block content 
     script(type='text/javascript').
       mdc.autoInit();
+    script(type='text/javascript', src='/scripts/default.js')

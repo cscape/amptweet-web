@@ -14,8 +14,9 @@ h6,
   font-family: 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif;
 }
 a {
-  color: #ffc107;
+  color: #f4511e;
 }
+
 .menu-links > .wrapper > .link,
 .menu-links > .wrapper > .account-info {
   display: inline-block;
@@ -28,6 +29,7 @@ a {
   clear: both;
   height: 100%;
   padding: 0.5rem 0;
+  position: relative;
 }
 .menu-links > .wrapper > .link a {
   display: block;
@@ -68,10 +70,12 @@ a {
   height: 2rem;
   line-height: 2rem;
   font-weight: 500;
+  color: inherit;
 }
 .top-bar .nav-bar {
   height: 100%;
   min-height: 3rem;
+  overflow: visible;
 }
 .top-bar > .nav-bar > .wrapper {
   height: 100%;
@@ -137,4 +141,25 @@ a {
 .hero > .inner-hero > .calltoaction > .info {
   font-weight: 500;
   opacity: 0.45;
+}
+
+.menu-links > .wrapper > .account-options {
+    background-color: #FAFAFA;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.35);
+    position: absolute;
+    top: 3rem;
+    width: 100%;
+    z-index: 10;
+    display: none;
+}
+
+.menu-links > .wrapper > .account-options li > a {
+    display: block;
+    padding: 0.25rem 0.5rem;
+    font-weight: 500;
+}
+
+.menu-links > .wrapper > .account-options li > a:hover {
+    outline: 1px dotted currentColor;
+    outline-offset: -0.25rem;
 }
