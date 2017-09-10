@@ -104,18 +104,23 @@ router.all('/twitter/callback', function(req, res) {
 });
 
 router.all('/twitter/logout', function(req, res) {
-  res.status(200)
-    .clearCookie('twitter_user_id')
-    .clearCookie('twitter_session_token')
-    .render('error', {
-      title: 'Goodbye',
-      message: 'You are now signed out of AmpTweet.',
-      error: {
-        status: "",
-        stack: ""
-      }
-    })
-    .end();
+  if (!req.user) {
+    res.status(302)
+      .append("Location", rootURL + '/')
+  } else {
+    res.status(200)
+      .clearCookie('twitter_user_id')
+      .clearCookie('twitter_session_token')
+      .render('error', {
+        title: 'Goodbye',
+        message: 'You are now signed out of AmpTweet.',
+        error: {
+          status: "See you soon",
+          stack: ""
+        }
+      })
+      .end();
+  }
 });
 
 router.get('/testing', function(req, res) {
