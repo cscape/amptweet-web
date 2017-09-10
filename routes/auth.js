@@ -36,7 +36,7 @@ let createUser = function (username, id, token, secret) {
     assert.equal(null, err);
     db.createCollection("users", function (err, results) {
       results.findOne(findOp, function(err, result){
-        if (assert(!null, result.twitter)) {
+        if (assert(!null, result)) {
           results.findOneAndUpdate(findOp, struct, function (err, result1){
             db.close();
           })
