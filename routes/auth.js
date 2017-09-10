@@ -1,6 +1,9 @@
 let express = require('express');
 let OAuth = require('oauth').OAuth;
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
 
+var mongoURL = process.env.MONGODB_URI;
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
 let debugStatus = typeof v8debug === 'object';
@@ -8,7 +11,6 @@ let rootURL = debugStatus === false ? 'https://amptweet.herokuapp.com' : 'http:/
 let callback_url = rootURL + '/auth/twitter/callback';
 
 let router = express.Router();
-
 let TwitterAuth = new OAuth(
   'https://api.twitter.com/oauth/request_token',
   'https://api.twitter.com/oauth/access_token',
@@ -18,6 +20,36 @@ let TwitterAuth = new OAuth(
   callback_url,
   'HMAC-SHA1'
 );
+
+let createUser = function (username, id, token, secret) {
+  let struct = {
+    twitter: {
+      username: username,
+      id: id,
+      accessToken: token,
+      accessTokenSecret: secret
+    }
+  };
+  let findOp = {twitter:{id:id}};
+  // Use connect method to connect to the server
+  MongoClient.connect(url, function(err, db) {
+    assert.equal(null, err);
+    db.createCollection("users", function (err, results) {
+      results.findOne(findOp, function(err, result){
+        if (assert(!null, result.twitter)) {
+          results.findOneAndUpdate(findOp, struct, function (err, result1){
+            db.close();
+          })
+        } else {
+          results.insertOne(struct, function (err, res) {
+            db.close();
+          })
+        }
+      })
+    });
+    
+  });
+};
 
 /* Listen for GET on /auth/twitter/redirect */
 router.all('/twitter/redirect', function(req, res) {
@@ -77,6 +109,12 @@ router.all('/twitter/callback', function(req, res) {
             });
           }
           console.log(`AccessToken-> ${OAuthAccessToken}\r\nAccessSecret->${OAuthAccessTokenSecret}`)
+          createUser(
+            JSON.parse(twitterResponseData).screen_name,
+            JSON.parse(twitterResponseData).id_str,
+            OAuthAccessToken,
+            OAuthAccessTokenSecret
+          );
           res.status(302)
             .cookie('twitter_session_token',
               Buffer.from(
@@ -127,4 +165,6 @@ router.all('/twitter/logout', function(req, res) {
 router.get('/testing', function(req, res) {
   res.send(req.rawHeaders);
 });
+
+
 module.exports = router;
