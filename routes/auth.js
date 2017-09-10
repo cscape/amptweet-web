@@ -31,11 +31,13 @@ let createUser = function (username, id, token, secret) {
     }
   };
   let findOp = {"twitter.id": id};
+  console.log(findOp);
   // Use connect method to connect to the server
   MongoClient.connect(mongoURL, function(err, db) {
     assert.equal(null, err);
     db.createCollection("users", function (err, results) {
       results.findOne(findOp, function(err, result){
+        console.log(JSON.stringify(result));
         if (assert(!null, result)) {
           results.findOneAndUpdate(findOp, struct, function (err, result1){
             db.close();
