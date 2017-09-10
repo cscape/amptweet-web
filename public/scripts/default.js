@@ -7,12 +7,13 @@ $(".top-bar .account-info > .usercontainer > .name").click(function (e) {
     boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.35)",
     top: "3rem",
     opacity: 1,
-    display: "block"
+    display: 'block'
   });
 
   if (optionsbox.css("display") === "none") {
     tween.play();
   } else {
-    tween.reverse(0).play();
+    tween.reverse(0);
+    tween.play();
   }
 });
