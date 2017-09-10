@@ -17,12 +17,16 @@ html
         nav.nav-bar(container)
           .wrapper(grid)
             .branding(column="center")
-              .name AmpTweet
-            .menu-links(column)
-              .wrapper
-                //- .link
-                //-   a(href='/') Home
-                if user
+              if user
+                -let logoURL = '/dashboard'
+              else
+                -let logoURL = '/' 
+              a.name(href=logoURL) AmpTweet
+            if user
+              .menu-links(column)
+                .wrapper
+                  //- .link
+                  //-   a(href='/') Home  
                   .account-info
                     .avatarcontainer
                       img.avatar(src=user.profile.avatar)
