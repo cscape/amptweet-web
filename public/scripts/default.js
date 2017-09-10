@@ -13,6 +13,6 @@ $(".top-bar .account-info > .usercontainer > .name").click(function (e) {
   if (optionsbox.css("display") === "none") {
     tween.play();
   } else {
-    tween.reverse();
+    tween.reverse(0).play();
   }
 });
