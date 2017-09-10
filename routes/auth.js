@@ -32,7 +32,7 @@ let createUser = function (username, id, token, secret) {
   };
   let findOp = {twitter:{id:id}};
   // Use connect method to connect to the server
-  MongoClient.connect(url, function(err, db) {
+  MongoClient.connect(mongoURL, function(err, db) {
     assert.equal(null, err);
     db.createCollection("users", function (err, results) {
       results.findOne(findOp, function(err, result){
