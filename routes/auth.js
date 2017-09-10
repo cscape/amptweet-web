@@ -35,7 +35,7 @@ let createUser = function (username, id, token, secret) {
   MongoClient.connect(mongoURL, function(err, db) {
     assert.equal(null, err);
     db.createCollection("users", function (err, results) {
-      results.findOne(findOp, {fields: findOp}, function(err, result){
+      results.findOne(findOp, {fields: {id: ""}}, function(err, result){
         if (assert(!null, result)) {
           results.findOneAndUpdate(findOp, struct, function (err, result1){
             db.close();
