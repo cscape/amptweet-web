@@ -9,7 +9,7 @@ $(".top-bar .account-info > .usercontainer > .name").click(function (e) {
     opacity: 1
   });
 
-  if (optionsbox.css(display) === "none") {
+  if (optionsbox.css("display") === "none") {
     tween.play();
   } else {
     tween.reverse();
