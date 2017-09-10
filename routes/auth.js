@@ -108,7 +108,12 @@ router.all('/twitter/logout', function(req, res) {
     .clearCookie('twitter_user_id')
     .clearCookie('twitter_session_token')
     .render('error', {
-      message: "You are now signed out of AmpTweet."
+      title: 'Goodbye',
+      message: 'You are now signed out of AmpTweet.',
+      error: {
+        status: "",
+        stack: ""
+      }
     })
     .end();
 });

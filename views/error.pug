@@ -1,8 +1,7 @@
 extends layout
 
 append content
-  if error.status
-    h1= error.status
+  h1= error.status
   h3= message
   if error.stack
     pre #{error.stack}
