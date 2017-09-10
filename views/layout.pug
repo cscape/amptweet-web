@@ -2,6 +2,11 @@ if user
   -var logoURL = '/dashboard'
 else
   -var logoURL = '/' 
+if title
+  -var bb = "AmpTweet :: " + title
+  -title = bb
+else
+  -var title = 'AmpTweet'
 
 doctype html
 html

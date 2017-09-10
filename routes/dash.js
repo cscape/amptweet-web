@@ -5,7 +5,7 @@ var router = express.Router();
 router.get('/', function (req, res) {
     if (req.user) {
         res.render('dashboard', {
-            title: `AmpTweet`,
+            title: `Dashboard`,
             user: req.user
         });
     } else {
