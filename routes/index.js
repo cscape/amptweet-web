@@ -9,7 +9,7 @@ router.get('/', function(req, res) {
       user: req.user
     });
   } else {
-    res.render('index', { title: 'AmpTweet' });
+    res.render('index', { title: 'Welcsome' });
   }
 });
 
