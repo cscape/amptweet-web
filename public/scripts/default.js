@@ -11,8 +11,10 @@ $(".top-bar .account-info > .usercontainer > .name").click(function (e) {
   });
 
   if (optionsbox.css("display") === "none") {
+    optionsbox.show();
     tween.play();
   } else {
+    optionsbox.hide();
     tween.reverse();
   }
 });
