@@ -38,7 +38,7 @@ let createUser = function (username, id, token, secret) {
     db.createCollection("users", function (err, results) {
       results.findOne(findOp, function(err, result){
         console.log(JSON.stringify(result));
-        if (assert(!null, result)) {
+        if (result) {
           results.findOneAndUpdate(findOp, struct, function (err, result1){
             db.close();
           })
