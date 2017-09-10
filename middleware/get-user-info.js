@@ -26,7 +26,8 @@ let userInfo = function (req, res, next) {
           profile: {
             avatar: data.profile_image_url_https,
             name: data.name,
-            username: data.screen_name
+            username: data.screen_name,
+            id: req.cookies.twitter_user_id
           }
         };
         req.user = user;

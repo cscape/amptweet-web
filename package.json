@@ -27,7 +27,7 @@
     "cookie-parser": "^1.4.3",
     "debug": "~2.6.3",
     "express": "^4.15.2",
-    "mongodb": "^2.2.30",
+    "mongodb": "^2.2.31",
     "morgan": "~1.8.1",
     "oauth": "^0.9.15",
     "pug": "^2.0.0-beta11",
