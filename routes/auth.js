@@ -104,7 +104,7 @@ router.all('/twitter/callback', function(req, res) {
 });
 
 router.all('/twitter/logout', function(req, res) {
-  if (req.user !== null) {
+  if (!req.user) {
     res.status(302)
       .append("Location", rootURL + '/')
       .end();
