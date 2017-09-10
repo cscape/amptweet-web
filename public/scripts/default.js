@@ -6,7 +6,8 @@ $(".top-bar .account-info > .usercontainer > .name").click(function (e) {
     ease: Power4.easeOut,
     boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.35)",
     top: "3rem",
-    opacity: 1
+    opacity: 1,
+    display: "block"
   });
 
   if (optionsbox.css("display") === "none") {
