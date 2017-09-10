@@ -87,6 +87,7 @@ a {
   font-size: 1.65rem;
   font-style: italic;
   color: #fafafa;
+  line-height: 3rem;
 }
 .hero {
   display: -webkit-box;
