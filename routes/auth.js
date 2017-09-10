@@ -30,7 +30,7 @@ let createUser = function (username, id, token, secret) {
       accessTokenSecret: secret
     }
   };
-  let findOp = {twitter: { $elemMatch: {id: id}}}; //
+  let findOp = {"twitter.id": id};
   // Use connect method to connect to the server
   MongoClient.connect(mongoURL, function(err, db) {
     assert.equal(null, err);
