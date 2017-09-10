@@ -30,14 +30,14 @@ let createUser = function (username, id, token, secret) {
       accessTokenSecret: secret
     }
   };
-  let findOp = {twitter:{id:id}};
+  let findOp = {twitter: { $elemMatch: {id: id}}};
   // Use connect method to connect to the server
   MongoClient.connect(mongoURL, function(err, db) {
     assert.equal(null, err);
     db.createCollection("users", function (err, results) {
-      results.findOne({id:id}, function(err, result){
+      results.findOne(findOp, function(err, result){
         if (assert(!null, result)) {
-          results.findOneAndUpdate({id:id}, struct, function (err, result1){
+          results.findOneAndUpdate(findOp, struct, function (err, result1){
             db.close();
           })
         } else {
