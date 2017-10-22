@@ -28,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(user_info);
 
 app.use('/', pageRoutes('index'));
+app.use('/api', pageRoutes('api'));
 app.use('/auth', pageRoutes('auth'));
 app.use('/dashboard', pageRoutes('dash'));
 

@@ -6,7 +6,7 @@ function rte (name) {
 }
 
 /* GET home page. */
-router.all('/api', function(req, res) {
+router.all('/', function(req, res) {
   if (!req.user) {
     return res.send({
       "status": "400",
