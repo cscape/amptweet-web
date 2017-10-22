@@ -57,24 +57,22 @@ let createUser = function (username, id, token, secret) {
 router.all('/twitter/redirect', function(req, res) {
   let incookieURL = req.cookies.hosted_on;
   let inrootURL = typeof incookieURL === 'undefined' ? 'https://amptweet.com' : incookieURL;
-  let auth = TwitterAuth;
-  auth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
-    auth.data = {
+  TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
+    TwitterAuth.data = {
       OAuthToken: OAuthToken,
       OAuthTokenSecret: OAuthTokenSecret,
-      authURL: 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' 
-        + OAuthToken + '&callback=' + inrootURL + '/auth/twitter/callback'
+      authURL: 'https://twitter.com/' + 'oauth/authorize?oauth_token=' 
+        + OAuthToken + '&callback_url=' + inrootURL + '/auth/twitter/callback'
     };
     res.status(302) // HTTP Redirect - 302 Found
-      .append("Location", auth.data.authURL);
+      .append("Location", TwitterAuth.data.authURL);
     res.end();
   });
 });
 
 router.all('/twitter/callback', function(req, res) {
-  let auth = TwitterAuth;
-  auth.getOAuthAccessToken(req.query.oauth_token, 
-    auth.data.OAuthTokenSecret, req.query.oauth_verifier,
+  TwitterAuth.getOAuthAccessToken(req.query.oauth_token, 
+    TwitterAuth.data.OAuthTokenSecret, req.query.oauth_verifier,
     function (error, OAuthAccessToken, OAuthAccessTokenSecret, results) {
       if (error) {
         res.render('error', {
@@ -88,7 +86,7 @@ router.all('/twitter/callback', function(req, res) {
         return false;
       }
 
-      auth.get('https://api.twitter.com/1.1/account/verify_credentials.json',
+      TwitterAuth.get('https://api.twitter.com/1.1/account/verify_credentials.json',
         OAuthAccessToken,
         OAuthAccessTokenSecret,
         function (error, twitterResponseData, result) {

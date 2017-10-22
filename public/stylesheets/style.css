@@ -92,7 +92,7 @@ a {
   background-color: rgba(0,0,0,0.25);
   flex: 10;
   align-self: stretch;
-  padding: 0 2rem;
+  padding: 0 1rem;
 }
 .nav-bar .branding > .name {
   font-weight: 600;
