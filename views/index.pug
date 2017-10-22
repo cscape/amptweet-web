@@ -5,8 +5,9 @@ block header
     +Header
     section.hero
       .inner-hero(container)
-        h1.lead(column="left 10").
-          Grow your Twitter audience. No billing, ever.
+        h1.lead(column="left 10")
+          | Grow your Twitter audience. No billing, 
+          b period.
         if !user
           .calltoaction(column="left")
             button(type="submit",
@@ -21,7 +22,7 @@ block header
               |  Currently in alpha testing.
 
 block content_before
-  div(container)
+  div._mts._mbs(container)
     div.
-      #[a(href="https://gitlab.com/amptweet") Visit us on the World Wide Web] 
+      #[a(href="https://gitlab.com/amptweet") Contribute on GitLab] 
       and #[a(href="https://twitter.com/AmpTweetSocial") follow us on Twitter!]

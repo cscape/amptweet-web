@@ -8,6 +8,10 @@ body, h1, h2, h3, h4, h5, h6, .mdc-button {
   font-family: 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif;
 }
 
+h3 {
+  font-weight: 500;
+}
+
 a {
   color: #377fc3;
 }
@@ -20,8 +24,7 @@ a {
   position: relative;
   > {
     .link, .account-info {
-      display: inline-block;
-      margin-right: 1rem;
+      display: block;
       height: 2rem;
       line-height: 2rem;
     }
@@ -38,17 +41,34 @@ a {
   }
 }
 
+.optionsNav {
+    background-color: #333;
+}
+
+ul {
+    list-style: none;
+}
+
+.optionsNav .title {color: #FFF;padding-left: 0;}
+
+.optionsNav ul li {
+    font-size: 1.2rem;
+    float: left;
+    color: #FAFAFA;
+}
+
+.optionsNav ul li > a {
+    display: block;
+}
+
+.optionsNav ul li > a:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
 .top-bar {
   min-height: 3rem;
-  background: #222;
-  color: #fafafa;
-  background-image: -webkit-linear-gradient(top left, #832520, #e45b58);
-  background-image: -moz-linear-gradient(top left, #832520, #e45b58);
-  background-image: -o-linear-gradient(top left, #832520, #e45b58);
-  background-image: linear-gradient(to bottom right, #832520, #e45b58);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 0% 50%;
+  background: #FFFFFF;
+  color: #333;
   .account-info {
     max-height: 3rem;
     clear: both;
@@ -59,7 +79,7 @@ a {
         width: 2rem;
         height: 2rem;
         overflow: hidden;
-        > .avatar {
+        .avatar {
           float: left;
           display: block;
           max-height: 100%;
@@ -91,14 +111,20 @@ a {
 
 .nav-bar .branding {
   > .name {
-    font-weight: 600;
+    > .logo {
+      height: 1.5rem;
+    }
+    align-items: center;
+    height: 100%;
+    vertical-align: middle;
+    display: inline-flex;
+    font-weight: 500;
     letter-spacing: -0.03em;
     font-size: 1.65rem;
     font-style: italic;
     color: #fafafa;
-    line-height: 3rem;
   }
-  background-color: rgba(0, 0, 0, 0.25);
+  height: 3rem;
   flex: 10;
   align-self: stretch;
   padding: 0 1rem;
@@ -126,9 +152,6 @@ a {
 }
 
 .hero-large {
-  > .top-bar {
-    background: transparent !important;
-  }
   position: relative;
   background: rgba(0, 0, 0, 0.17);
   &:before {
@@ -146,10 +169,13 @@ a {
 
 .hero > .inner-hero > {
   .lead {
+    > b {
+      font-weight: 700;
+      color: #FFC107;
+      text-transform: uppercase;
+    }
     font-size: 2.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-style: italic;
+    font-weight: 600;
     color: #fff;
     text-shadow: 0.25rem 0.25rem 1.25rem rgba(0, 0, 0, 0.35);
   }
@@ -165,7 +191,7 @@ a {
     }
     .info {
       font-weight: 500;
-      opacity: 0.45;
+      color: #ff0;
     }
   }
 }
@@ -175,14 +201,20 @@ a {
   box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.35);
   position: absolute;
   top: 2rem;
-  width: 100%;
+  width: auto;
   z-index: 10;
   display: none;
+  min-width: 7rem;
+  right: 0;
   opacity: 0;
+  .name {
+    padding: 0.25rem 0.5rem;
+  }
   li > a {
     display: block;
     padding: 0.25rem 0.5rem;
     font-weight: 500;
+    white-space: pre;
     &:hover {
       outline: 1px dotted currentColor;
       outline-offset: -0.25rem;

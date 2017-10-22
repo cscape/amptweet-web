@@ -10,9 +10,10 @@ else
 mixin Header
   header.top-bar
     nav.nav-bar(container)
-      .wrapper(grid)
+      .wrapper(grid="no-collapse")
         .branding(column="center")
-          a.name(href=logoURL) AmpTweet
+          a.name(href=logoURL)
+            img.logo(src='/images/brand.svg', alt='AmpTweet')
         if user
           .menu-links(column)
             .wrapper
@@ -20,11 +21,14 @@ mixin Header
               //-   a(href='/') Home  
               .account-info
                 .avatarcontainer
-                  img.avatar(src=user.profile.avatar)
-                .usercontainer
-                  a.name(title=('@' + user.profile.username), href="#")=user.profile.name
+                  a.name(title=('@' + user.profile.username), href="#")
+                    img.avatar(src=user.profile.avatar)
               .account-options
                 ul
+                  li
+                    .name 
+                      small Hello, 
+                      =user.profile.name
                   li
                     a(href="/auth/twitter/logout") Sign out
 
@@ -35,6 +39,7 @@ html
     title= nootitle
     meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
     link(rel='stylesheet', href='https://cdn.concisecss.com/concise.min.css')
+    link(rel='stylesheet', href='https://cdn.concisecss.com/concise-utils/concise-utils.min.css')
     link(rel='stylesheet', href='https://cdn.materialdesignicons.com/1.9.32/css/materialdesignicons.min.css')
     link(rel='stylesheet', href='https://unpkg.com/material-components-web@0.16.0/dist/material-components-web.min.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
@@ -47,7 +52,7 @@ html
     block header
       +Header
     block content_before
-      div(container)
+      div._mtxs(container)
         block content 
     script(type='text/javascript').
       mdc.autoInit();

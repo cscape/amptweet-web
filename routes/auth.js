@@ -17,7 +17,7 @@ let TwitterAuth = new OAuth(
   consumer_key,
   consumer_secret,
   '1.0A',
-  callback_url,
+  '',
   'HMAC-SHA1'
 );
 
@@ -61,7 +61,7 @@ router.all('/twitter/redirect', function(req, res) {
     TwitterAuth.data = {
       OAuthToken: OAuthToken,
       OAuthTokenSecret: OAuthTokenSecret,
-      authURL: 'https://twitter.com/' + 'oauth/authorize?oauth_token=' 
+      authURL: 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' 
         + OAuthToken + '&callback_url=' + inrootURL + '/auth/twitter/callback'
     };
     res.status(302) // HTTP Redirect - 302 Found
@@ -71,6 +71,8 @@ router.all('/twitter/redirect', function(req, res) {
 });
 
 router.all('/twitter/callback', function(req, res) {
+  let incookieURL = req.cookies.hosted_on;
+  let inrootURL = typeof incookieURL === 'undefined' ? 'https://amptweet.com' : incookieURL;
   TwitterAuth.getOAuthAccessToken(req.query.oauth_token, 
     TwitterAuth.data.OAuthTokenSecret, req.query.oauth_verifier,
     function (error, OAuthAccessToken, OAuthAccessTokenSecret, results) {
@@ -139,7 +141,7 @@ router.all('/twitter/callback', function(req, res) {
               }
             )
             // Redirect to dashboard after successful login
-            .append("Location", rootURL + '/dashboard')
+            .append("Location", inrootURL + '/dashboard')
             .end();
         });
     }
@@ -147,9 +149,11 @@ router.all('/twitter/callback', function(req, res) {
 });
 
 router.all('/twitter/logout', function(req, res) {
+  let incookieURL = req.cookies.hosted_on;
+  let inrootURL = typeof incookieURL === 'undefined' ? 'https://amptweet.com' : incookieURL;
   if (!req.user) {
     res.status(302)
-      .append("Location", rootURL + '/')
+      .append("Location", inrootURL + '/')
       .end();
   } else {
     res.status(200)
