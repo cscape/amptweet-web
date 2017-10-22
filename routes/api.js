@@ -15,6 +15,12 @@ router.all('/', function(req, res) {
   } else if (req.user) {
     router.get('/auto_like', rte('GET/auto_like'));
     router.post('/auto_like', rte('POST/auto_like'));
+    router.all('/*', function(req, res){
+      return res.send({
+        "status": "404",
+        "message": "Endpoint is invalid or does not exist."
+      })
+    })
   }
 });
 
