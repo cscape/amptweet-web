@@ -7,7 +7,7 @@ var mongoURL = process.env.MONGODB_URI;
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
 let debugStatus = typeof v8debug === 'object';
-let rootURL = debugStatus === false ? 'https://amptweet.herokuapp.com' : 'http://127.0.0.1:3000';
+let rootURL = 'https://amptweet.com';
 let callback_url = rootURL + '/auth/twitter/callback';
 
 let router = express.Router();
@@ -55,21 +55,26 @@ let createUser = function (username, id, token, secret) {
 
 /* Listen for GET on /auth/twitter/redirect */
 router.all('/twitter/redirect', function(req, res) {
-  TwitterAuth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
-    TwitterAuth.data = {
+  let incookieURL = req.cookies.hosted_on;
+  let inrootURL = typeof incookieURL === 'undefined' ? 'https://amptweet.com' : incookieURL;
+  let auth = TwitterAuth;
+  auth.getOAuthRequestToken(function (error, OAuthToken, OAuthTokenSecret, results) {
+    auth.data = {
       OAuthToken: OAuthToken,
       OAuthTokenSecret: OAuthTokenSecret,
-      authURL: 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' + OAuthToken
+      authURL: 'https://twitter.com/' + 'oauth/authenticate?oauth_token=' 
+        + OAuthToken + '&callback=' + inrootURL + '/auth/twitter/callback'
     };
     res.status(302) // HTTP Redirect - 302 Found
-      .append("Location", TwitterAuth.data.authURL);
+      .append("Location", auth.data.authURL);
     res.end();
   });
 });
 
 router.all('/twitter/callback', function(req, res) {
-  TwitterAuth.getOAuthAccessToken(req.query.oauth_token, 
-    TwitterAuth.data.OAuthTokenSecret, req.query.oauth_verifier,
+  let auth = TwitterAuth;
+  auth.getOAuthAccessToken(req.query.oauth_token, 
+    auth.data.OAuthTokenSecret, req.query.oauth_verifier,
     function (error, OAuthAccessToken, OAuthAccessTokenSecret, results) {
       if (error) {
         res.render('error', {
@@ -83,7 +88,7 @@ router.all('/twitter/callback', function(req, res) {
         return false;
       }
 
-      TwitterAuth.get('https://api.twitter.com/1.1/account/verify_credentials.json',
+      auth.get('https://api.twitter.com/1.1/account/verify_credentials.json',
         OAuthAccessToken,
         OAuthAccessTokenSecret,
         function (error, twitterResponseData, result) {

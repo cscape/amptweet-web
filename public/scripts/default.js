@@ -2,18 +2,23 @@ $(".top-bar .account-info > .usercontainer > .name").click(function (e) {
   e.stopPropagation();
   e.preventDefault();
   let optionsbox = $(".top-bar .account-options");
-  let tween = TweenLite.to(optionsbox, 0.75, {
-    ease: Power4.easeOut,
-    boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.35)",
-    top: "3rem",
-    opacity: 1,
-    display: 'block'
-  });
+  let tween;
 
   if (optionsbox.css("display") === "none") {
-    tween.play();
+    TweenLite.to(optionsbox, 0.75, {
+      ease: Power4.easeOut,
+      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.35)",
+      top: "3rem",
+      opacity: 1,
+      display: 'block'
+    });
   } else {
-    tween.reverse(0);
-    tween.play();
+    TweenLite.to(optionsbox, 0.75, {
+      ease: Power4.easeOut,
+      boxShadow: "0px 0px 0px rgba(0, 0, 0, 0.35)",
+      top: "2rem",
+      opacity: 0,
+      display: 'none'
+  });
   }
 });

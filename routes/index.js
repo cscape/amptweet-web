@@ -9,7 +9,8 @@ router.get('/', function(req, res) {
       user: req.user
     });
   } else {
-    res.render('index', { title: 'Welcsome' });
+    res.cookie('hosted_on', 'https://' + req.header('Host'))
+      .render('index', { title: 'Welcome' });
   }
 });
 
