@@ -95,6 +95,6 @@ console.log("Services started.");
       }
     }
     checkTL();
-    var interval = setInterval(() => {checkTL()}, 240e3);
+    var interval = setInterval(() => {checkTL()}, 36e4); //every 6 minutes
   }
 })();
