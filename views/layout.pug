@@ -3,7 +3,7 @@ if user
 else
   -var logoURL = '/' 
 if title
-  -var nootitle = "AmpTweet :: " + title
+  -var nootitle = title + ' - AmpTweet'
 else
   -var nootitle = 'AmpTweet'
 
@@ -35,19 +35,21 @@ mixin Header
 doctype html
 html
   head
-    meta(charset='utf-8')
-    title= nootitle
-    meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
-    link(rel='stylesheet', href='https://cdn.concisecss.com/concise.min.css')
-    link(rel='stylesheet', href='https://cdn.concisecss.com/concise-utils/concise-utils.min.css')
-    link(rel='stylesheet', href='https://cdn.materialdesignicons.com/1.9.32/css/materialdesignicons.min.css')
-    link(rel='stylesheet', href='https://unpkg.com/material-components-web@0.16.0/dist/material-components-web.min.css')
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='/stylesheets/cooper-hewitt.css')
-    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js')
-    script(type='text/javascript', src='https://unpkg.com/material-components-web@0.16.0/dist/material-components-web.min.js')
-    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenLite.min.js')
-    script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/plugins/CSSPlugin.min.js')
+    block head
+      meta(charset='utf-8')
+      title= nootitle
+      meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
+      link(rel='stylesheet', href='https://cdn.concisecss.com/concise.min.css')
+      link(rel='stylesheet', href='https://cdn.concisecss.com/concise-utils/concise-utils.min.css')
+      link(rel='stylesheet', href='https://cdn.materialdesignicons.com/1.9.32/css/materialdesignicons.min.css')
+      link(rel='stylesheet', href='https://unpkg.com/material-components-web@0.16.0/dist/material-components-web.min.css')
+      link(rel='stylesheet', href='/stylesheets/style.css')
+      link(rel='stylesheet', href='/stylesheets/cooper-hewitt.css')
+      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js')
+      script(type='text/javascript', src='https://unpkg.com/material-components-web@0.16.0/dist/material-components-web.min.js')
+      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenLite.min.js')
+      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/plugins/CSSPlugin.min.js')
+      script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin='anonymous')
   body
     block header
       +Header
