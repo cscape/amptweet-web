@@ -7,7 +7,10 @@ function rte (name) {
 }
 
 router.get('/auto_like', rte('GET/auto_like'));
+router.get('/follower_count', rte('GET/follower_count'));
+
 router.post('/auto_like', rte('POST/auto_like'));
+
 router.all('/*', function(req, res) {
   throw ({
     status: 404,

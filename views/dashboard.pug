@@ -6,10 +6,12 @@ prepend content_before
   .optionsNav
     ul(container)
       li.title._ps Dashboard
+      li._ps(id='followerCount')
+        b 
 block content
   label.label--checkbox
-    input(type="checkbox" class="checkbox" id="autolike" disabled style='position:relative;top:0.5rem;')
-    span Tweet Auto-Liker
+    input(type="checkbox" class="checkbox" id="autolike" disabled)
+    span._mlxs Tweet Auto-Liker
     br
     small
       span This tool automatically likes Tweets periodically from your timeline.

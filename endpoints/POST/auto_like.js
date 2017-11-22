@@ -38,6 +38,8 @@ let autolike = function (req, res) {
         }
       });
     }
+  } else {
+    res.end();
   }
 }
 

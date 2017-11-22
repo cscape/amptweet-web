@@ -1,3 +1,9 @@
+$.get("/api/follower_count", function(data){
+    let count = data.data.count;
+    $("#followerCount b").text(count);
+    $("#followerCount").append(' Followers')
+});
+
 $.get("/api/auto_like", function(data){
     if (data.data.status === true) {
         $("#autolike").prop('checked', true)

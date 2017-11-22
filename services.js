@@ -4,8 +4,10 @@ var assert = require('assert');
 var mongoURL = process.env.MONGODB_URI;
 var Twitter = require('twitter');
 
+let Services = {};
+
 console.log("Services started.");
-(function(){ 
+(function AutoLiker(){ 
   /** Twitter Accounts Tracker
    * @description Keeps track of all accounts and
    * whether the Tweet-Liker is on or off.
@@ -64,37 +66,134 @@ console.log("Services started.");
       access_token_key: credentials.accessToken,
       access_token_secret: credentials.accessTokenSecret
     });
-    let lastTweet;
-    function checkTL() {
+    if (useStream === false) {
+      let interval = setInterval(() => {checkTL()}, 600000); //every 6 minutes
+      let lastTweet;
+      function checkTL() {
+        console.log(`Sent request for ${credentials.id}`);
+        client.get('statuses/home_timeline', {
+          count: 15, since_id: lastTweet, include_entities: false
+        }, function(error, tweets, response) {
+          console.log(`Got response for ${credentials.id}`);
+          if (!error) {
+            let tweet = tweets[0];
+            lastTweet = tweet.id_str;
+            if (tweet.user.id_str !== credentials.id) {
+              client.post('favorites/create', {
+                id: tweet.id_str, include_entities: false
+              }, function(error, tweet, response){
+                console.log(`Got LIKE response for ${credentials.id}`)
+                if (error) console.error(error);
+                else console.log(`Liked ${tweet.id_str}`);
+              });
+            }
+          } else {
+            console.log(error);
+          }
+        });
+      }
       if (tracker.accounts[credentials.id] && tracker.accounts[credentials.id].enabled === true) {
         if (tracker.accounts[credentials.id].instances) {
           tracker.accounts[credentials.id].instances[0]++;
           clearInterval(interval);
         } else if (!tracker.accounts[credentials.id].instances) {
           tracker.accounts[credentials.id].instances = [0];
-          client.get('statuses/home_timeline', {
-            count: 1, since_id: lastTweet, include_entities: false
-          }, function(error, tweets, response) {
-            if (!error) {
-              let tweet = tweets[0];
-              console.log(`Got ${tweet.id_str}`)
-              lastTweet = tweet.id_str;
-              client.post('favorites/create', {
-                id: tweet.id_str, include_entities: false
-              }, function(error, tweet, response){
-                if (error) console.error(error);
-                else console.log(`Liked ${tweet.id_str}`);
-              });
-            } else {
-              console.log(error);
-            }
-          });
+          checkTL();
         }
       } else {
         clearInterval(interval);
       }
+    } else if (useStream === true) {
+      if (tracker.accounts[credentials.id] && tracker.accounts[credentials.id].enabled === true) {
+          if (tracker.accounts[credentials.id].instances) {
+            tracker.accounts[credentials.id].instances[0]++;
+          } else if (!tracker.accounts[credentials.id].instances) {
+            tracker.accounts[credentials.id].instances = [0];
+            //OK to go
+
+            client.stream('statuses/filter', {
+              
+            })
+          }
+      }
     }
-    checkTL();
-    var interval = setInterval(() => {checkTL()}, 36e4); //every 6 minutes
   }
 })();
+
+Services.UpdateFollowers = (id, token, secret) => {
+  let client = new Twitter({
+    consumer_key: process.env.TWITTER_CONSUMER_KEY,
+    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+    access_token_key: token,
+    access_token_secret: secret
+  });
+  let struct = {
+    user_id: id,
+    follower_count: 0,
+    followers: []
+  };
+  let findOp = {"user_id": id};
+  console.log(findOp);
+  // Use connect method to connect to the server
+  MongoClient.connect(mongoURL, function(err, db) {
+    assert.equal(null, err);
+    /*
+    db.collection("users", function (err, collection) {
+      collection.findOne({"twitter.id": id}, function (err, doc) {
+        doc.twitter.accessToken
+        doc.twitter.accessTokenSecret
+      });
+    });*/
+
+    db.createCollection("twitter-stats", function (err, results) {
+      results.findOne(findOp, function(err, doc){
+
+        let getFollowers = function(callback) {
+          this.getList = (callback) => {
+            let cursor = -1;
+            function repeatList() {
+              client.get('followers/list', 
+                {user_id: id, cursor: cursor, count: 200,
+                  skip_status: true, include_user_entities: false}, function (err, data, raw){
+                let followerList = struct.followers;
+                struct.followers = followerList.concat(data.users);
+                cursor = data.next_cursor_str;
+                if (parseInt(cursor) === 0) {
+                  callback();
+                } else {
+                  repeatList();
+                }
+              });
+            }
+            repeatList();
+          }
+          this.getCount = (callback) => {
+            client.get('users/show', {user_id: id}, function (err, data){
+              struct.follower_count = data.followers_count;
+              this.getList(callback);
+            });
+          }
+          // Initiates getFollowers.getCount() when getFollowers() is called
+          this.getCount(callback);
+        }
+
+        if (doc) {
+          getFollowers(function(){
+            results.findOneAndUpdate(findOp, struct, function (err, result1){
+              db.close();
+            });
+          });
+        } else {
+          getFollowers(function(){
+            results.insertOne(struct, function (err, res) {
+              db.close();
+            })
+          })
+        }
+      })
+    });
+    
+  });
+};
+
+module.exports = Services;

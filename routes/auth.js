@@ -2,12 +2,13 @@ let express = require('express');
 let OAuth = require('oauth').OAuth;
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
+let Services = require(__base + 'services');
 
 var mongoURL = process.env.MONGODB_URI;
 let consumer_key = process.env.TWITTER_CONSUMER_KEY;
 let consumer_secret = process.env.TWITTER_CONSUMER_SECRET;
 let debugStatus = typeof v8debug === 'object';
-let rootURL = 'https://amptweet.com';
+let rootURL = 'http://amptweet.com';
 let callback_url = rootURL + '/auth/twitter/callback';
 
 let router = express.Router();
@@ -40,10 +41,12 @@ let createUser = function (username, id, token, secret) {
         console.log(JSON.stringify(result));
         if (result) {
           results.findOneAndUpdate(findOp, struct, function (err, result1){
+            Services.UpdateFollowers(id, token, secret);
             db.close();
           })
         } else {
           results.insertOne(struct, function (err, res) {
+            Services.UpdateFollowers(id, token, secret);
             db.close();
           })
         }
