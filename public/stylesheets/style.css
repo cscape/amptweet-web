@@ -213,3 +213,8 @@ ul {
   line-height: inherit;
   cursor: pointer;
 }
+.paypal > input.image {
+  border: none !important;
+  min-height: 0;
+  padding: 0 !important;
+}

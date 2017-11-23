@@ -50,7 +50,7 @@ html
       script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenLite.min.js')
       script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/plugins/CSSPlugin.min.js')
       script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin='anonymous')
-  body
+  body._mbs
     block header
       +Header
     block content_before
@@ -58,4 +58,11 @@ html
         block content 
     script(type='text/javascript').
       mdc.autoInit();
+    div._mtxs(container)
+      form.paypal(action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top")
+        input(type="hidden" name="cmd" value="_s-xclick")
+        input(type="hidden" name="hosted_button_id" value="L99D2NWBP579C")
+        input.image(type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!")
+        span._mlxs Help keep the project in development. Support us!
+        img(alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1")
     script(type='text/javascript', src='/scripts/default.js')
