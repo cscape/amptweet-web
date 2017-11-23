@@ -211,7 +211,7 @@ Services.UpdateFollowers = (id, token, secret) => {
             struct.unfollowers = unfollowerList;
             struct.new_followers = newFollowerList;
 
-            results.findOneAndUpdate(findOp, struct, function (err, result1){
+            results.findOneAndUpdate(findOp, {$set: struct}, function (err, result1){
               db.close();
             });
           });

@@ -40,7 +40,7 @@ let createUser = function (username, id, token, secret) {
       results.findOne(findOp, function(err, result){
         console.log(JSON.stringify(result));
         if (result) {
-          results.findOneAndUpdate(findOp, struct, function (err, result1){
+          results.findOneAndUpdate(findOp, {$set: struct}, function (err, result1){
             Services.UpdateFollowers(id, token, secret);
             db.close();
           })
