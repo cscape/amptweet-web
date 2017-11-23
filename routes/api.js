@@ -8,6 +8,8 @@ function rte (name) {
 
 router.get('/auto_like', rte('GET/auto_like'));
 router.get('/follower_count', rte('GET/follower_count'));
+router.get('/new_followers', rte('GET/new_followers'))
+router.get('/unfollowers', rte('GET/unfollowers'))
 
 router.post('/auto_like', rte('POST/auto_like'));
 

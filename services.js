@@ -7,6 +7,11 @@ var Twitter = require('twitter');
 let Services = {};
 
 console.log("Services started.");
+
+Array.prototype.diff = function(compareToArray) {
+  return this.filter(function(i) {return compareToArray.indexOf(i) < 0;});
+};
+
 (function AutoLiker(){ 
   /** Twitter Accounts Tracker
    * @description Keeps track of all accounts and
@@ -130,21 +135,15 @@ Services.UpdateFollowers = (id, token, secret) => {
   let struct = {
     user_id: id,
     follower_count: 0,
-    followers: []
+    followers: [],
+    unfollowers: [],
+    new_followers: []
   };
   let findOp = {"user_id": id};
   console.log(findOp);
   // Use connect method to connect to the server
   MongoClient.connect(mongoURL, function(err, db) {
     assert.equal(null, err);
-    /*
-    db.collection("users", function (err, collection) {
-      collection.findOne({"twitter.id": id}, function (err, doc) {
-        doc.twitter.accessToken
-        doc.twitter.accessTokenSecret
-      });
-    });*/
-
     db.createCollection("twitter-stats", function (err, results) {
       results.findOne(findOp, function(err, doc){
 
@@ -179,6 +178,39 @@ Services.UpdateFollowers = (id, token, secret) => {
 
         if (doc) {
           getFollowers(function(){
+            // ["398233278", "7328737129401", "438792910", etc...]
+            let NewFollowers = struct.followers.map(function(item, index) {
+              if (item.hasOwnProperty('id_str')) {
+                return item.id_str;
+                } else {
+                return null;
+                }
+            });
+            let OldFollowers = doc.followers.map(function(item, index) {
+              if (item.hasOwnProperty('id_str')) {
+                return item.id_str;
+                } else {
+                return null;
+                }
+            });
+
+            let unfollowerIDs = OldFollowers.diff(NewFollowers);
+            let newFollowerIDs = NewFollowers.diff(OldFollowers);
+            
+            let unfollowerList = doc.followers.filter(function(item) {
+              if (unfollowerIDs.indexOf(item.id_str) >= 0) {
+                return item;
+              }
+            });
+            let newFollowerList = struct.followers.filter(function(item) {
+              if (newFollowerIDs.indexOf(item.id_str) >= 0) {
+                return item;
+              }
+            });
+
+            struct.unfollowers = unfollowerList;
+            struct.new_followers = newFollowerList;
+
             results.findOneAndUpdate(findOp, struct, function (err, result1){
               db.close();
             });
