@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var stylus = require('stylus');
 var user_info = require('./middleware/get-user-info.js');
+var SocketService = require('socket.io');
 
 // Sets the base directory
 global.__base = __dirname + '/';
@@ -65,5 +66,29 @@ app.use(function(err, req, res, next) {
     );
   }
 });
+/*
+app.socket = new SocketService(app, {
+  path: '/api/events'
+});
 
+app.socket.use((socket, next) => {
+  let cookies = socket.request.headers.cookie;
+  if (cookies && cookies.twitter_session_token) {
+    socket.twitterSession = {
+      session: JSON.parse(Buffer.from(
+        cookies.twitter_session_token, 'base64')
+        .toString('ascii')),
+      twitter_id: cookies.twitter_user_id
+    };
+    return next();
+  } else {
+    next(new Error('Authentication error'));
+  }
+});
+
+app.socket.on('connect', (socket) => {
+  let session = socket.twitterSession;
+  socket.join(session.twitter_id);
+});
+*/
 module.exports = app;

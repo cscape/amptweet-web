@@ -1,4 +1,6 @@
 extends layout
+append head
+  script(type='text/javascript', src='/scripts/homepage.js')
 
 block header
   section.hero-large
@@ -9,14 +11,11 @@ block header
           | Grow your Twitter audience. No billing, 
           b period.
         if !user
-          .calltoaction(column="left")
-            button(type="submit",
-              class="twitter-sign-in mdc-button mdc-button--raised\
-              mdc-button--primary mdc-ripple-surface",
-              onclick="window.location=\"/auth/twitter/redirect\"",
-              data-mdc-auto-init="MDCRipple")
-              | Sign in with Twitter 
-              span.mdi.mdi-arrow-right
+          .calltoaction(column="left" ng-controller="twitterSignIn as data")
+            md-button(class="twitter-sign-in md-raised md-primary",
+              ng-click="window.location='/auth/twitter/redirect'")
+              | {{data.signInText}}
+              i.material-icons arrow forward
             h6.info
               span.mdi.mdi-alert-circle-outline
               |  Currently in alpha testing.

@@ -41,23 +41,27 @@ html
       meta(name='viewport' content='width=device-width, initial-scale=1, user-scalable=no')
       link(rel='stylesheet', href='https://cdn.concisecss.com/concise.min.css')
       link(rel='stylesheet', href='https://cdn.concisecss.com/concise-utils/concise-utils.min.css')
-      link(rel='stylesheet', href='https://cdn.materialdesignicons.com/1.9.32/css/materialdesignicons.min.css')
-      link(rel='stylesheet', href='https://unpkg.com/material-components-web@0.16.0/dist/material-components-web.min.css')
       link(rel='stylesheet', href='/stylesheets/style.css')
       link(rel='stylesheet', href='/stylesheets/cooper-hewitt.css')
-      script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js')
+      link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.5/angular-material.min.css" integrity="sha256-x4+zqlHRe1r5dR0o1hzljoQHpWEW6+8V+1IcTRR1h/U=" crossorigin="anonymous")
+      link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")
       script(type='text/javascript', src='https://unpkg.com/material-components-web@0.16.0/dist/material-components-web.min.js')
       script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenLite.min.js')
       script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/plugins/CSSPlugin.min.js')
       script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin='anonymous')
-  body._mbs
+      script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.6/angular.min.js" integrity="sha256-Nfc6cMygZ4KL6eCnEri0iQjhvESQY3xivXAVj5XNbic=" crossorigin="anonymous")
+      script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.min.js" integrity="sha256-E6XubcgT4a601977ZZP4Yw/0UCB2/Ex+Bazst+JRw1U=" crossorigin="anonymous")
+      script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-animate.min.js" integrity="sha256-1XBp/KwjxhvrtZiQ+ecAScAyLPe4OStn2lMX0vxTq9U=" crossorigin="anonymous")
+      script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-aria.min.js" integrity="sha256-9per5naK1wbvJeCJC4Xr3gjiycTRg9Jno/eSvh12+ck=" crossorigin="anonymous")
+      script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-messages.min.js" integrity="sha256-2pwnp0gYfK+zdy02nYSL8GNlfcfo+oNVb0k6pTO1ebQ=" crossorigin="anonymous")
+      script(type='text/javascript', src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.5/angular-material.min.js" integrity="sha256-V4+TCuIl+iFDamH1NvVE0brCN3ES0BfSGmVKC7dFgPQ=" crossorigin="anonymous")
+      script(type='text/javascript', src='/scripts/default.js')
+  body._mbs(ng-app="AmpTweet")
     block header
       +Header
     block content_before
       div._mtxs(container)
-        block content 
-    script(type='text/javascript').
-      mdc.autoInit();
+        block content
     div._mtxs(container)
       form.paypal(action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top")
         input(type="hidden" name="cmd" value="_s-xclick")
@@ -65,4 +69,4 @@ html
         input.image(type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!")
         span._mlxs Help keep the project in development. Support us!
         img(alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1")
-    script(type='text/javascript', src='/scripts/default.js')
+    
