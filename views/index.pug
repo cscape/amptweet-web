@@ -3,7 +3,7 @@ append head
   script(type='text/javascript', src='/scripts/homepage.js')
 
 block header
-  section.hero-large
+  section.hero-large(ng-cloak)
     +Header
     section.hero
       .inner-hero(container)
@@ -12,13 +12,14 @@ block header
           b period.
         if !user
           .calltoaction(column="left" ng-controller="twitterSignIn as data")
-            md-button(class="twitter-sign-in md-raised md-primary",
-              ng-click="window.location='/auth/twitter/redirect'")
-              | {{data.signInText}}
-              i.material-icons arrow forward
+            md-button(class="md-raised md-primary",
+              ng-click='data.signIn()')
+              span {{data.signInText}}
+            md-button.md-icon-button.md-raised.md-primary(ng-click='data.signIn()')
+              i.material-icons arrow_forward
             h6.info
-              span.mdi.mdi-alert-circle-outline
-              |  Currently in alpha testing.
+              i.material-icons warning
+              span Currently in alpha testing.
 
 block content_before
   div._mts._mbs(container)

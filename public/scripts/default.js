@@ -1,7 +1,26 @@
-var AmpTweet = angular.module('AmpTweet', ['ngMaterial']);
+let AmpTweet = angular.module('AmpTweet', ['ngMaterial'])
+  .config(function($mdThemingProvider) {
+    $mdThemingProvider.theme('default')
+      .primaryPalette('red', {
+        default: '500'
+      })
+      .accentPalette('purple', {
+        default: '500'
+      });
+    $mdThemingProvider.theme('default-dark', 'default')
+      .dark();
+  });
 
-$(document).on('ready', function(){
-/*  $(".top-bar .account-info .name").click(function (e) {
+AmpTweet.controller('headerCtrl', [ function() {
+  const header = this;
+  header.account = {};
+  header.account.signOut = function() {
+    window.location.href = '/auth/twitter/logout';
+  };
+}]);
+
+/*$(document).on('ready', () =>  {
+  $(".top-bar .account-info .name").click(function (e) {
     e.stopPropagation();
     e.preventDefault();
     let optionsbox = $(".top-bar .account-options");
@@ -24,5 +43,5 @@ $(document).on('ready', function(){
         display: 'none'
     });
     }
-  });*/
-});
+  });
+});*/

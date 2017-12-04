@@ -1,35 +1,39 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var stylus = require('stylus');
-var user_info = require('./middleware/get-user-info.js');
-var SocketService = require('socket.io');
+const express = require('express');
+const path = require('path');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const stylus = require('stylus');
+const userInfo = require('./middleware/get-user-info.js');
+const SocketService = require('socket.io');
+
 
 // Sets the base directory
-global.__base = __dirname + '/';
+global.baseDIR = `${__dirname}/`;
 
-function pageRoutes (name) {
+/** Page-Route Shortcut
+ * @param {string} name Page Route Name
+ * @returns {string} './routes/example.js'
+ */
+function pageRoutes(name) {
   return require(`./routes/${name}`);
 }
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(stylus.middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(user_info);
+app.use(userInfo);
 
 app.use('/', pageRoutes('index'));
 app.use('/api', pageRoutes('api'));
@@ -37,26 +41,28 @@ app.use('/auth', pageRoutes('auth'));
 app.use('/dashboard', pageRoutes('dash'));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
+
 // error handler
-app.use(function(err, req, res, next) {
-  let statusCode = err.status || 500;
-  let renderType = err.render;
+app.use((err, req, res, next) => {
+  const statusCode = err.status || 500;
+  const renderType = err.render;
   // render the error page
-  if (renderType === false) { 
+  if (renderType === false) {
     res.status(statusCode)
       .send({
-        "status": statusCode,
-        "message": err.message
-    });
+        status: statusCode,
+        message: err.message
+      });
+    next();
   } else {
     res.status(statusCode)
       .render('error', {
-        title: "Error",
+        title: 'Error',
         message: err.message,
         error: {
           status: statusCode,
@@ -64,6 +70,7 @@ app.use(function(err, req, res, next) {
         }
       }
     );
+    next();
   }
 });
 /*

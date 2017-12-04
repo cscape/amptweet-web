@@ -1,7 +1,7 @@
 :root {
   --mdc-theme-primary: #212121;
   --mdc-theme-accent: #1976d2;
-  font-family: 'Cooper Hewitt', -apple-system, Helvetica Neue, Segoe UI, San Francisco, Ubuntu, sans-serif;
+  font-family: -apple-system, Helvetica Neue, Segoe UI, 'Roboto', San Francisco, Ubuntu, sans-serif;
 }
 body,
 h1,
@@ -146,15 +146,7 @@ ul {
 }
 .hero-large {
   position: relative;
-  background: rgba(0,0,0,0.17);
-}
-.hero-large:before {
-  content: '';
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  background-color: #000;
-  z-index: -2;
+  background-color: rgba(0,0,0,0.17);
   background-image: url("../images/promo.jpg");
   background-size: cover;
   background-position: 20% 20%;
@@ -213,8 +205,16 @@ ul {
   line-height: inherit;
   cursor: pointer;
 }
+.layoutCard {
+  max-width: 600px;
+  margin: 8px auto !important;
+}
 .paypal > input.image {
   border: none !important;
   min-height: 0;
   padding: 0 !important;
+}
+.mainToolbar .avatar {
+  background-size: 100%;
+  background-repeat: no-repeat;
 }

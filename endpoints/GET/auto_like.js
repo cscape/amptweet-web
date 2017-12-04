@@ -1,47 +1,51 @@
-var express = require('express');
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
-var mongoURL = process.env.MONGODB_URI;
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
 
-let autolike = function (req, res) {
+const mongoURL = process.env.MONGODB_URI;
+
+/** Tweet Auto-Like Checker
+ * @param {object} req Express request object
+ * @param {object} res Express response object
+ * @return {null} Doesn't return anything.
+ */
+const autolike = function autolike(req, res) {
+  function dispatcher(status) {
+    return res.send({
+      status: 200,
+      message: 'OK',
+      data: {
+        status
+      }
+    });
+  }
   if (req.user) {
-    let query = {"twitter.id": req.user.profile.id};
-    MongoClient.connect(mongoURL, function(err, db) {
+    const query = { 'twitter.id': req.user.profile.id };
+    MongoClient.connect(mongoURL, (err, db) => {
       assert.equal(null, err);
-      db.collection("users", function (err, collection) {
-        collection.findOne(query, function (err, doc) {
-          console.log(doc);
-          if (typeof doc.services !== 'undefined') {
-            collection.findOne(query, function (err, doc) {
-              statusOnOff(doc.services.autolike);
+      db.collection('users', (err, collection) => {
+        collection.findOne(query, (err1, doc1) => {
+          console.log(doc1);
+          if (typeof doc1.services !== 'undefined') {
+            collection.findOne(query, (err2, doc2) => {
+              dispatcher(doc2.services.autolike);
               db.close();
             });
           } else {
-            collection.findOneAndUpdate(query, { $set: 
-              {
-                services: {
-                  autolike: false
-                }
+            collection.findOneAndUpdate(query, { $set:
+            {
+              services: {
+                autolike: false
               }
+            }
             });
-            statusOnOff(false);
+            dispatcher(false);
           }
-        })
-      });  
-    });
-
-    function statusOnOff (onOff) {
-      return res.send({
-        "status": 200,
-        "message": "OK",
-        "data": {
-          "status": onOff
-        }
+        });
       });
-    }
+    });
   } else {
     res.end();
   }
-}
+};
 
 module.exports = autolike;

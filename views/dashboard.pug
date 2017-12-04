@@ -2,19 +2,23 @@ extends layout
 append head
   script(type='text/javascript', src='/scripts/dashboard.js')
 
-prepend content_before
-  .optionsNav
-    ul(container)
-      li.title._ps Dashboard
-      li._ps(id='followerCount')
-        b 
 block content
-  label.label--checkbox
-    input(type="checkbox" class="checkbox" id="autolike" disabled)
-    span._mlxs Tweet Auto-Liker
-    br
-    small
-      span This tool automatically likes Tweets periodically from your timeline.
-      | <br><b>NOTICE:</b> Twitter does not allow the use of tools to automatically
-      | like Tweets. Proceed at your own risk.
-  
+  md-content.dashTitle(md-theme="default-dark" layout-gt-sm="row" layout-padding)
+    ul
+      li.md-display-1 Dashboard
+      li(id='followerCount')
+        b 
+  md-card.layoutCard(layout-margin layout-padding
+    layout="column")
+    md-card-title
+      md-card-title-text
+        span.md-headline Automation Tools
+    md-card-content
+      div(flex ng-controller="autolike as liker")
+        md-checkbox(ng-model="liker.status" id='autolike'
+          ng-disabled="liker.loading === true"
+          ng-click='liker.init()') Tweet Auto-Liker
+      p This tool automatically likes Tweets periodically from your timeline. 
+        | Twitter does not allow the use of tools to automatically
+        | like Tweets. Proceed at your own risk.
+      

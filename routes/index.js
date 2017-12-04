@@ -1,15 +1,16 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+
+const router = express.Router();
 
 /* GET home page. */
-router.get('/', function(req, res) {
+router.get('/', (req, res) => {
   if (req.user) {
     res.render('index', {
-      title: `Welcome`,
+      title: 'Welcome',
       user: req.user
     });
   } else {
-    res.cookie('hosted_on', 'https://' + req.header('Host'))
+    res.cookie('hosted_on', `https://${req.header('Host')}`)
       .render('index', { title: 'Welcome' });
   }
 });

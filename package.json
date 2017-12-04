@@ -23,6 +23,14 @@
     "start": "node ./bin/www",
     "services": "node services.js"
   },
+  "devDependencies": {
+    "cdir": "^0.1.2",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.1",
+    "eslint-plugin-react": "^6.7.1"
+  },
   "dependencies": {
     "body-parser": "^1.17.1",
     "cookie-parser": "^1.4.3",
