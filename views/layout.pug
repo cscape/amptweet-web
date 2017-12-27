@@ -10,8 +10,9 @@ else
 mixin Header
   md-toolbar.mainToolbar.md-primary(md-whiteframe='3' ng-controller='headerCtrl as ctrl')
     .md-toolbar-tools(layout="row" layout-align="space-between center")
-      md-button.md-icon-button(aria-label='Open side navigation')
-        i.material-icons menu
+      if user
+        md-button.md-icon-button(aria-label='Open side navigation')
+          i.material-icons menu
       h3(md-truncate flex="100")
         a.name(href=logoURL) AmpTweet
       if user
@@ -62,6 +63,8 @@ html
       //link(rel='stylesheet', href='https://cdn.concisecss.com/concise.min.css')
       //link(rel='stylesheet', href='https://cdn.concisecss.com/concise-utils/concise-utils.min.css')
       link(rel='stylesheet', href='/stylesheets/style.css')
+      link(rel='stylesheet', href='/stylesheets/concise.min.css')
+      link(rel='stylesheet', href='/stylesheets/concise-utils.min.css')
       link(rel='stylesheet', href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900")
       link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.5/angular-material.min.css" integrity="sha256-x4+zqlHRe1r5dR0o1hzljoQHpWEW6+8V+1IcTRR1h/U=" crossorigin="anonymous")
       link(rel="stylesheet", href="https://fonts.googleapis.com/icon?family=Material+Icons")

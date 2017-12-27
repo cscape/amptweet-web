@@ -1,52 +1,40 @@
-$.get('/api/follower_count', (data) => {
-  const count = data.data.count;
-  $('#followerCount b').text(count);
-  $('#followerCount').append(' Followers');
-});
+AmpTweet.controller('dashHead', ['$http', function dashHead($http){
+  let ctrl = this;
+  $http.get('/api/follower_count').then((response) => {
+    const count = response.data.data.count;
+    ctrl.followerCount = count;
+  });
+}]);
 
-$.get('/api/new_followers', (data) => {
-  $('body md-content.main').append('<div class="_mtxs newfollows" container>');
-  $('.newfollows').append('<h4>New Followers</h4>');
-  $('.newfollows').append('<ul>');
-  if (data.data && data.data.users) {
-    data.data.users.forEach((item, index) => {
-      $('.newfollows ul').append(`
-              <li>
-                  <img src="${item.profile_image_url_https}">
-                  <a href="https://www.twitter.com/${item.screen_name}">
-                      <span>
-                          <b> ${item.name} </b>
-                      </span>
-                      <span>@${item.screen_name}</span>
-                  </a>
-              </li>
-          `);
-    });
-  }
-});
+AmpTweet.controller('unfollowerCtrl', ['$http', function unfollowerCtrl($http) {
+  let ctrl = this;
+  ctrl.show = false;
+  ctrl.unfollowers = [];
+  $http.get('/api/unfollowers').then((response) => {
+    if (response.data.data && response.data.data.users) {
+      ctrl.show = true;
+      ctrl.unfollowers = response.data.data.users;
+    } else {
+      ctrl.show = false;
+    }
+  });
+}]);
 
-$.get('/api/unfollowers', (data) => {
-  $('body md-content.main').append('<div class="_mtxs unfollows" container>');
-  $('.unfollows').append('<h4>Unfollowers</h4>');
-  $('.unfollows').append('<ul>');
-  if (data.data && data.data.users) {
-    data.data.users.forEach((item, index) => {
-      $('.unfollows ul').append(`
-              <li>
-                  <img src="${item.profile_image_url_https}">
-                  <a href="https://www.twitter.com/${item.screen_name}">
-                      <span>
-                          <b> ${item.name} </b>
-                      </span>
-                      <span>@${item.screen_name}</span>
-                  </a>
-              </li>
-          `);
-    });
-  }
-});
+AmpTweet.controller('newfollowerCtrl', ['$http', function unfollowerCtrl($http) {
+  let ctrl = this;
+  ctrl.show = false;
+  ctrl.unfollowers = [];
+  $http.get('/api/new_followers').then((response) => {
+    if (response.data.data && response.data.data.users) {
+      ctrl.show = true;
+      ctrl.newfollowers = response.data.data.users;
+    } else {
+      ctrl.show = false;
+    }
+  });
+}]);
 
-AmpTweet.controller('autolike', ['$http', function($http) {
+AmpTweet.controller('autolike', ['$http', function autolike($http) {
   let autolike = this;
   autolike.status = false;
   autolike.loading = true;
@@ -78,42 +66,4 @@ AmpTweet.controller('autolike', ['$http', function($http) {
       }
     });
   };
-  
-  /*$scope.autolike.init = function() {
-    $scope.autolike.loading = true;
-    if ($scope.autolike.status === true) {
-      return  $http
-      .get('/api/stuff');
-      .then(data => {
-        console.log('Boom!', data);
-      });
-  
-        $.post('/api/auto_like', { turn: 'off' }, (data) => {
-          if (data.data.status === true) {
-            $scope.autolike.status = true;
-            $scope.autolike.loading = false;
-            resolve(true);
-          } else {
-            $scope.autolike.status = false;
-            $scope.autolike.loading = false;
-            resolve(false);
-          }
-        });
-      });
-    } else {
-      return $q(function(resolve, retract) {
-        $.post('/api/auto_like', { turn: 'on' }, (data) => {
-          if (data.data.status === true) {
-            $scope.autolike.status = true;
-            $scope.autolike.loading = false;
-            resolve(true);
-          } else {
-            $scope.autolike.status = false;
-            $scope.autolike.loading = false;
-            resolve(false);
-          }
-        });
-      });
-    }
-  };*/
 }]);

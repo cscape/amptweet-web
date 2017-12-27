@@ -4,21 +4,19 @@ append head
 
 block header
   section.hero-large(ng-cloak)
-    +Header
+    if user 
+      +Header
     section.hero
-      .inner-hero(container)
-        h1.lead(column="left 10")
-          | Grow your Twitter audience. No billing, 
-          b period.
+      .inner-hero._text-center(container)
+        h1.lead
+          | Welcome to AmpTweet
+        h4.lead-desc Grow your Twitter audience. No billing, ever.
         if !user
-          .calltoaction(column="left" ng-controller="twitterSignIn as data")
+          .calltoaction._mtxs(ng-controller="twitterSignIn as data")
             md-button(class="md-raised md-primary",
               ng-click='data.signIn()')
-              span {{data.signInText}}
-            md-button.md-icon-button.md-raised.md-primary(ng-click='data.signIn()')
-              i.material-icons arrow_forward
+              span._mlxs._mrxs {{data.signInText}}
             h6.info
-              i.material-icons warning
               span Currently in alpha testing.
 
 block content_before

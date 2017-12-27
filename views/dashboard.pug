@@ -3,11 +3,15 @@ append head
   script(type='text/javascript', src='/scripts/dashboard.js')
 
 block content
-  md-content.dashTitle(md-theme="default-dark" layout-gt-sm="row" layout-padding)
+  md-content.dashTitle(md-theme="default-dark" 
+    ng-controller="dashHead as ctrl" layout-gt-sm="row" layout-padding)
     ul
-      li.md-display-1 Dashboard
-      li(id='followerCount')
-        b 
+      li.md-display-1._mbxs Dashboard
+      li
+        span(ng-hide="ctrl.followerCount") Loading followers...
+        span(ng-show="ctrl.followerCount") 
+          b {{ctrl.followerCount}}
+          |  Followers
   md-card.layoutCard(layout-margin layout-padding
     layout="column")
     md-card-title
@@ -21,4 +25,33 @@ block content
       p This tool automatically likes Tweets periodically from your timeline. 
         | Twitter does not allow the use of tools to automatically
         | like Tweets. Proceed at your own risk.
-      
+  md-card.layoutCard(layout-margin layout-padding
+    layout="column" ng-controller="newfollowerCtrl as ctrl"
+    ng-show="ctrl.show")
+    md-card-title
+      md-card-title-text
+        span.md-headline New Followers
+    md-list
+      md-list-item(style="padding: 0;" ng-repeat="user in ctrl.newfollowers")
+        img.md-avatar(alt="{{user.name}}" ng-src="{{user.profile_image_url_https}}")
+        a.userDesc.md-list-item-text(ng-href="https://www.twitter.com/{{user.screen_name}}")
+          span
+            b {{user.name}}
+            | &nbsp;
+          br
+          span @{{user.screen_name}}
+  md-card.layoutCard(layout-margin layout-padding
+    layout="column" ng-controller="unfollowerCtrl as ctrl"
+    ng-show="ctrl.show")
+    md-card-title
+      md-card-title-text
+        span.md-headline Unfollowers
+    md-list
+      md-list-item(style="padding: 0;" ng-repeat="user in ctrl.unfollowers")
+        img.md-avatar(alt="{{user.name}}" ng-src="{{user.profile_image_url_https}}")
+        a.userDesc.md-list-item-text(ng-href="https://www.twitter.com/{{user.screen_name}}")
+          span
+            b {{user.name}}
+            | &nbsp;
+          br
+          span @{{user.screen_name}}
