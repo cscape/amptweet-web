@@ -8,18 +8,18 @@ block content
     .md-display-1 Dashboard
     ul.collapsed.followerStats
       li._mrxs
-        span(ng-hide="ctrl.followerCount") Loading followers...
-        span(ng-show="ctrl.followerCount") 
+        span(ng-hide="ctrl.followerCount >= 0") Loading followers...
+        span(ng-show="ctrl.followerCount >= 0")
           b {{ctrl.followerCount}}
           |  Followers
       li._mrxs
-        span(ng-hide="ctrl.newFollowerCount") Loading new followers...
-        span(ng-show="ctrl.newFollowerCount")
+        span(ng-hide="ctrl.newFollowerCount >= 0") Loading new followers...
+        span(ng-show="ctrl.newFollowerCount >= 0")
           b {{ctrl.newFollowerCount}}
           |  New Followers
       li
-        span(ng-hide="ctrl.unfollowerCount") Loading unfollowers...
-        span(ng-show="ctrl.unfollowerCount")
+        span(ng-hide="ctrl.unfollowerCount >= 0") Loading unfollowers...
+        span(ng-show="ctrl.unfollowerCount >= 0")
           b {{ctrl.unfollowerCount}}
           |  Unfollowers
   md-card.layoutCard(layout-margin layout-padding
@@ -50,17 +50,17 @@ block content
             | &nbsp;
           br
           span @{{user.screen_name}}
-        //md-button.follow.md-fab.md-mini.md-primary(aria-label="Follow @{{user.screen_name}}"
+        //- md-button.follow.md-fab.md-mini.md-primary(aria-label="Follow @{{user.screen_name}}"
           ng-show="user.following === false" md-theme="follows")
           md-icon
             i.material-icons add
-        //md-button.unfollow.md-fab.md-mini.md-accent(aria-label="Unfollow @{{user.screen_name}}"
+        //- md-button.unfollow.md-fab.md-mini.md-accent(aria-label="Unfollow @{{user.screen_name}}"
           ng-show="user.following === true" md-theme="follows")
           md-icon
             i.material-icons remove
   md-card.layoutCard(layout-margin layout-padding
     layout="column" ng-controller="unfollowerCtrl as ctrl"
-    ng-show="ctrl.show")
+    ng-show="ctrl.show && ctrl.unfollowers.length")
     md-card-title
       md-card-title-text
         span.md-headline Unfollowers
