@@ -4,13 +4,14 @@ const Twitter = require('twitter');
 
 const mongoURL = process.env.MONGODB_URI;
 const Services = {};
-const debugStatus = typeof v8debug === 'object';
+const debugStatus = typeof v8debug === 'object'
+  || /--debug|--inspect/.test(process.execArgv.join(' '));
 
 Array.prototype.diff = function (compareToArray) {
   return this.filter((i) => compareToArray.indexOf(i) < 0);
 };
 
-if (debugStatus) {
+if (!debugStatus) {
   console.log('Services started.');
 
   (function AutoLiker() {
@@ -137,7 +138,7 @@ if (debugStatus) {
     }
   }());
 } else {
-  console.log('Services failed to start due to debug status.')
+  console.log('Services failed to start due to debug status.');
 }
 
 Services.UpdateFollowers = (id, token, secret) => {
@@ -149,19 +150,23 @@ Services.UpdateFollowers = (id, token, secret) => {
   });
   const struct = {
     user_id: id,
-    follower_count: 0,
+    counts: {
+      followers: 0,
+      new_followers: 0,
+      unfollowers: 0
+    },
     followers: [],
     unfollowers: [],
-    new_followers: []
+    new_followers: [],
   };
   const findOp = { user_id: id };
-  console.log(findOp);
   // Use connect method to connect to the server
   MongoClient.connect(mongoURL, (err, db) => {
     assert.equal(null, err);
     db.createCollection('twitter-stats', (err, results) => {
       results.findOne(findOp, (err, doc) => {
         const getFollowers = function (callback) {
+          /** Gets followers list from Twitter */
           this.getList = (callback) => {
             let cursor = -1;
             function repeatList() {
@@ -185,7 +190,7 @@ Services.UpdateFollowers = (id, token, secret) => {
           };
           this.getCount = (callback) => {
             client.get('users/show', { user_id: id }, function (err, data) {
-              struct.follower_count = data.followers_count;
+              struct.counts.followers = data.followers_count;
               this.getList(callback);
             });
           };
@@ -199,16 +204,16 @@ Services.UpdateFollowers = (id, token, secret) => {
             const NewFollowers = struct.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } 
+              } else {
                 return null;
-              
+              }
             });
             const OldFollowers = doc.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } 
+              } else {
                 return null;
-              
+              }
             });
 
             const unfollowerIDs = OldFollowers.diff(NewFollowers);
@@ -227,6 +232,8 @@ Services.UpdateFollowers = (id, token, secret) => {
 
             struct.unfollowers = unfollowerList;
             struct.new_followers = newFollowerList;
+            struct.counts.new_followers = newFollowerIDs.length;
+            struct.counts.unfollowers = unfollowerIDs.length;
 
             results.findOneAndUpdate(findOp, { $set: struct }, (err, result1) => {
               db.close();

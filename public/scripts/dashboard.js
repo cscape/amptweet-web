@@ -4,6 +4,14 @@ AmpTweet.controller('dashHead', ['$http', function dashHead($http){
     const count = response.data.data.count;
     ctrl.followerCount = count;
   });
+  $http.get('/api/follower_count_new').then((response) => {
+    const count = response.data.data.count;
+    ctrl.newFollowerCount = count;
+  });
+  $http.get('/api/follower_count_unfollowers').then((response) => {
+    const count = response.data.data.count;
+    ctrl.unfollowerCount = count;
+  });
 }]);
 
 AmpTweet.controller('unfollowerCtrl', ['$http', function unfollowerCtrl($http) {

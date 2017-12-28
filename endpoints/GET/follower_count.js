@@ -3,16 +3,16 @@ var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var mongoURL = process.env.MONGODB_URI;
 
-let autolike = function (req, res) {
+module.exports = function (req, res) {
   if (req.user) {
     let query = {"user_id": req.user.profile.id};
     MongoClient.connect(mongoURL, function(err, db) {
       assert.equal(null, err);
       db.collection("twitter-stats", function (err, collection) {
         collection.findOne(query, function (err, doc) {
-          console.log(doc);
           if (doc) {
-            status(doc.follower_count);
+            console.log(doc.counts);
+            status(doc.counts.followers);
             db.close();
           } else {
             throw ({
@@ -37,6 +37,4 @@ let autolike = function (req, res) {
   } else {
     res.end();
   }
-}
-
-module.exports = autolike;
+};

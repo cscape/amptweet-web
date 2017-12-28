@@ -232,4 +232,9 @@ md-checkbox.md-align-center>div.md-container {
 }
 .layoutCard .userDesc {
   line-height: 1.33;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+ul.collapsed > li {
+  display: inline-block;
 }

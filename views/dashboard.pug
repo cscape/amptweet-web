@@ -4,14 +4,24 @@ append head
 
 block content
   md-content.dashTitle(md-theme="default-dark" 
-    ng-controller="dashHead as ctrl" layout-gt-sm="row" layout-padding)
-    ul
-      li.md-display-1._mbxs Dashboard
-      li
+    ng-controller="dashHead as ctrl" layout="column" layout-padding)
+    .md-display-1 Dashboard
+    ul.collapsed.followerStats
+      li._mrxs
         span(ng-hide="ctrl.followerCount") Loading followers...
         span(ng-show="ctrl.followerCount") 
           b {{ctrl.followerCount}}
           |  Followers
+      li._mrxs
+        span(ng-hide="ctrl.newFollowerCount") Loading new followers...
+        span(ng-show="ctrl.newFollowerCount")
+          b {{ctrl.newFollowerCount}}
+          |  New Followers
+      li
+        span(ng-hide="ctrl.unfollowerCount") Loading unfollowers...
+        span(ng-show="ctrl.unfollowerCount")
+          b {{ctrl.unfollowerCount}}
+          |  Unfollowers
   md-card.layoutCard(layout-margin layout-padding
     layout="column")
     md-card-title
@@ -33,13 +43,21 @@ block content
         span.md-headline New Followers
     md-list
       md-list-item(style="padding: 0;" ng-repeat="user in ctrl.newfollowers")
-        img.md-avatar(alt="{{user.name}}" ng-src="{{user.profile_image_url_https}}")
-        a.userDesc.md-list-item-text(ng-href="https://www.twitter.com/{{user.screen_name}}")
+        img.md-avatar(alt="Avatar" onerror="this.src='/images/avatar.jpg'" ng-src="{{user.profile_image_url_https}}")
+        a.userDesc.md-list-item-text(flex ng-href="https://www.twitter.com/{{user.screen_name}}")
           span
             b {{user.name}}
             | &nbsp;
           br
           span @{{user.screen_name}}
+        //md-button.follow.md-fab.md-mini.md-primary(aria-label="Follow @{{user.screen_name}}"
+          ng-show="user.following === false" md-theme="follows")
+          md-icon
+            i.material-icons add
+        //md-button.unfollow.md-fab.md-mini.md-accent(aria-label="Unfollow @{{user.screen_name}}"
+          ng-show="user.following === true" md-theme="follows")
+          md-icon
+            i.material-icons remove
   md-card.layoutCard(layout-margin layout-padding
     layout="column" ng-controller="unfollowerCtrl as ctrl"
     ng-show="ctrl.show")
@@ -48,7 +66,7 @@ block content
         span.md-headline Unfollowers
     md-list
       md-list-item(style="padding: 0;" ng-repeat="user in ctrl.unfollowers")
-        img.md-avatar(alt="{{user.name}}" ng-src="{{user.profile_image_url_https}}")
+        img.md-avatar(alt="Avatar" onerror="this.src='/images/avatar.jpg'" ng-src="{{user.profile_image_url_https}}")
         a.userDesc.md-list-item-text(ng-href="https://www.twitter.com/{{user.screen_name}}")
           span
             b {{user.name}}

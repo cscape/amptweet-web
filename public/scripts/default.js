@@ -9,6 +9,13 @@ let AmpTweet = angular.module('AmpTweet', ['ngMaterial'])
       });
     $mdThemingProvider.theme('default-dark', 'default')
       .dark();
+    $mdThemingProvider.theme('follows')
+      .primaryPalette('green', {
+        default: '500'
+      })
+      .accentPalette('red', {
+        default: '500'
+      });
   });
 
 AmpTweet.controller('headerCtrl', [ function() {

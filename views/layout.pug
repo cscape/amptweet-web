@@ -25,33 +25,9 @@ mixin Header
             md-menu-divider
             md-menu-item
               md-button(ng-click='ctrl.account.signOut()')
-                md-button.md-icon-button
+                md-icon 
                   i.material-icons power_settings_new
                 | Sign Out
-
-  //header.top-bar
-    nav.nav-bar(container)
-      .wrapper(grid="no-collapse")
-        .branding(column="center")
-          a.name(href=logoURL)
-            img.logo(src='/images/brand.svg', alt='AmpTweet')
-        if user
-          .menu-links(column)
-            .wrapper
-              //- .link
-              //-   a(href='/') Home  
-              .account-info
-                .avatarcontainer
-                  a.name(title=('@' + user.profile.username), href="#")
-                    img.avatar(src=user.profile.avatar)
-              .account-options
-                ul
-                  li
-                    .name 
-                      small Hello, 
-                      =user.profile.name
-                  li
-                    a(href="/auth/twitter/logout") Sign out
 
 doctype html
 html
