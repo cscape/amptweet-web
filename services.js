@@ -8,7 +8,7 @@ const debugStatus = typeof v8debug === 'object'
   || /--debug|--inspect/.test(process.execArgv.join(' '));
 
 Array.prototype.diff = function (compareToArray) {
-  return this.filter((i) => compareToArray.indexOf(i) < 0);
+  return this.filter(i => compareToArray.indexOf(i) < 0);
 };
 
 if (!debugStatus) {
@@ -31,7 +31,7 @@ if (!debugStatus) {
         return true;
       }
     };
-  
+
     /** MongoDB filtering query
      * @description This filter selects only
      * users with the autolike service turned on.
@@ -92,7 +92,8 @@ if (!debugStatus) {
           if (!error) {
             const tweet = tweets[0];
             lastTweet = tweet.id_str;
-            if (tweet.user.id_str !== credentials.id) {
+            if (tweet.user.id_str !== credentials.id
+             && tweet.favorited !== true) {
               client.post('favorites/create', {
                 id: tweet.id_str, include_entities: false
               }, (error, tweet, response) => {
@@ -106,10 +107,10 @@ if (!debugStatus) {
           }
         });
       }
-  
+
       if (useStream === false) {
         const interval = setInterval(() => { checkTL(); }, 600000); // every 6 minutes
-        
+
         if (tracker.accounts[credentials.id] && tracker.accounts[credentials.id].enabled === true) {
           if (tracker.accounts[credentials.id].instances) {
             tracker.accounts[credentials.id].instances[0]++;
@@ -126,13 +127,13 @@ if (!debugStatus) {
           if (tracker.accounts[credentials.id].instances) {
             tracker.accounts[credentials.id].instances[0]++;
           } else if (!tracker.accounts[credentials.id].instances) {
-              tracker.accounts[credentials.id].instances = [0];
+            tracker.accounts[credentials.id].instances = [0];
               // OK to go
-  
-              client.stream('statuses/filter', {
-  
+
+            client.stream('statuses/filter', {
+
               });
-            }
+          }
         }
       }
     }
@@ -141,7 +142,7 @@ if (!debugStatus) {
   console.log('Services failed to start due to debug status.');
 }
 
-Services.UpdateFollowers = (id, token, secret) => {
+Services.OldUpdateFollowers = (id, token, secret) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -157,7 +158,7 @@ Services.UpdateFollowers = (id, token, secret) => {
     },
     followers: [],
     unfollowers: [],
-    new_followers: [],
+    new_followers: []
   };
   const findOp = { user_id: id };
   // Use connect method to connect to the server
@@ -204,16 +205,16 @@ Services.UpdateFollowers = (id, token, secret) => {
             const NewFollowers = struct.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } else {
+              } 
                 return null;
-              }
+              
             });
             const OldFollowers = doc.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } else {
+              } 
                 return null;
-              }
+              
             });
 
             const unfollowerIDs = OldFollowers.diff(NewFollowers);
@@ -236,6 +237,152 @@ Services.UpdateFollowers = (id, token, secret) => {
             struct.counts.unfollowers = unfollowerIDs.length;
 
             results.findOneAndUpdate(findOp, { $set: struct }, (err, result1) => {
+              db.close();
+            });
+          });
+        } else {
+          getFollowers(() => {
+            results.insertOne(struct, (err, res) => {
+              db.close();
+            });
+          });
+        }
+      });
+    });
+  });
+};
+
+Services.UpdateFollowers = (id, token, secret) => {
+  const client = new Twitter({
+    consumer_key: process.env.TWITTER_CONSUMER_KEY,
+    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+    access_token_key: token,
+    access_token_secret: secret
+  });
+  function filterUserData(user) {
+    let userNew = {};
+    const allowed_keys = ['id_str',
+      'name',
+      'screen_name',
+      'protected',
+      'followers_count',
+      'friends_count',
+      'created_at',
+      'favourites_count',
+      'lang',
+      'profile_image_url_https',
+      'following',
+      'follow_request_sent',
+      'muting',
+      'blocking',
+      'blocked_by',
+      'metadata'
+    ];
+    for (let property in user) {
+      if (allowed_keys.indexOf(property) > -1) {
+        userNew[property] = user[property];
+      }
+      if (Object.keys(userNew).length === allowed_keys.length) {
+        return userNew;
+      }
+    }
+  };
+  const struct = {
+    user_id: id,
+    counts: {
+      followers: 0,
+      new_followers: 0,
+      unfollowers: 0
+    },
+    followers: []
+  };
+  const findOp = { user_id: id };
+  // Use connect method to connect to the server
+  MongoClient.connect(mongoURL, (err, db) => {
+    assert.equal(null, err);
+    db.createCollection('twitter-stats', (err, results) => {
+      results.findOne(findOp, (err, doc) => {
+        const getFollowers = function (callback) {
+          /** Gets followers list from Twitter */
+          this.getList = (callback) => {
+            let cursor = -1;
+            function repeatList() {
+              client.get('followers/list',
+                { user_id: id,
+                  cursor,
+                  count: 200,
+                  skip_status: true,
+                  include_user_entities: false }, (err, data, raw) => {
+                    if (err) {
+                      throw ({
+                        status: 500,
+                        message: err.errors,
+                        render: false
+                      });
+                    }
+                    const followerList = struct.followers;
+                    let users = data.users.map(function(user, index) {
+                      return filterUserData(user);
+                    });
+                    struct.followers = followerList.concat(users);
+                    cursor = data.next_cursor_str;
+                    if (parseInt(cursor) === 0) {
+                      callback();
+                    } else {
+                      repeatList();
+                    }
+                  });
+            }
+            repeatList();
+          };
+          this.getCount = (callback) => {
+            client.get('users/show', { user_id: id }, function (err, data) {
+              struct.counts.followers = data.followers_count;
+              this.getList(callback);
+            });
+          };
+          // Initiates getFollowers.getCount() when getFollowers() is called
+          this.getCount(callback);
+        };
+
+        if (doc) {
+          getFollowers(() => {
+            // ["398233278", "7328737129401", "438792910", etc...]
+            const NewFollowers = struct.followers.map((item, index) => {
+              if (item.hasOwnProperty('id_str')) {
+                return item.id_str;
+              } 
+                return null;
+              
+            });
+            const OldFollowers = doc.followers.map((item, index) => {
+              if (item.hasOwnProperty('id_str')) {
+                return item.id_str;
+              } 
+                return null;
+              
+            });
+
+            const unfollowerIDs = OldFollowers.diff(NewFollowers);
+            const newFollowerIDs = NewFollowers.diff(OldFollowers);
+
+            const unfollowerList = doc.followers.filter((item) => {
+              if (unfollowerIDs.indexOf(item.id_str) >= 0) {
+                return item;
+              }
+            });
+            const newFollowerList = struct.followers.filter((item) => {
+              if (newFollowerIDs.indexOf(item.id_str) >= 0) {
+                return item;
+              }
+            });
+
+            struct.unfollowers = unfollowerList;
+            struct.new_followers = newFollowerList;
+            struct.counts.new_followers = newFollowerIDs.length;
+            struct.counts.unfollowers = unfollowerIDs.length;
+
+            results.findOneAndReplace(findOp, struct, (err2, result1) => {
               db.close();
             });
           });
