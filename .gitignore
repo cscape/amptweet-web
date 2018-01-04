@@ -12,7 +12,6 @@ logs
 
 # Files
 
-package-lock.json
 .env
 *.log
 *.pid
