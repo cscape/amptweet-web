@@ -41,12 +41,12 @@ const createUser = function createUser(username, id, token, secret) {
         console.log(JSON.stringify(result));
         if (result) {
           results.findOneAndUpdate(findOp, { $set: struct }, (err, result1) => {
-            Services.NewUpdateFollowers(id, token, secret);
+            Services.UpdateFollowers(id, token, secret);
             db.close();
           });
         } else {
           results.insertOne(struct, (err, res) => {
-            Services.NewUpdateFollowers(id, token, secret);
+            Services.UpdateFollowers(id, token, secret);
             db.close();
           });
         }
@@ -163,6 +163,7 @@ router.all('/twitter/logout', (req, res) => {
       .clearCookie('twitter_session_token')
       .render('error', {
         title: 'Goodbye',
+        type: 'signout',
         message: 'You are now signed out of AmpTweet.',
         error: {
           status: 'See you soon',

@@ -3,7 +3,7 @@ var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var mongoURL = process.env.MONGODB_URI;
 
-let autolike = function (req, res) {
+module.exports = function (req, res) {
   if (req.user) {
     let query = {"user_id": req.user.profile.id};
     MongoClient.connect(mongoURL, function(err, db) {
@@ -12,7 +12,12 @@ let autolike = function (req, res) {
         collection.findOne(query, function (err, doc) {
           console.log(doc);
           if (doc) {
-            status(doc.new_followers);
+            let $followers = doc.followers.filter((item) => {
+              if (item.metadata.new_follower === true) {
+                return item;
+              }
+            });
+            status($followers);
             db.close();
           } else {
             throw ({
@@ -38,5 +43,3 @@ let autolike = function (req, res) {
     res.end();
   }
 }
-
-module.exports = autolike;

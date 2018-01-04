@@ -251,16 +251,27 @@ Services.UpdateFollowers = (id, token, secret) => {
   });
 };
 
-Services.NewUpdateFollowers = (id, token, secret) => {
+Services.UpdateFollowers = (id, token, secret) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
     access_token_key: token,
     access_token_secret: secret
   });
-  async function filterUserData(user) {
-    const userNew = {};
-    const allowedKeys = ['id_str',
+  const struct = {
+    user_id: id,
+    counts: {
+      followers: 0,
+      new_followers: 0,
+      unfollowers: 0
+    },
+    unfollowers: [],
+    followers: []
+  };
+  function filterUserData(user, callback) {
+    let userNew = {};
+    const allowedKeys = [
+      'id_str',
       'name',
       'screen_name',
       'protected',
@@ -274,29 +285,18 @@ Services.NewUpdateFollowers = (id, token, secret) => {
       'follow_request_sent',
       'muting',
       'blocking',
-      'blocked_by',
-      'metadata'
+      'blocked_by'
     ];
-    await (new Promise((resolve) => {
-      for (const property in user) {
-        if (allowedKeys.indexOf(property) > -1) {
-          userNew[property] = user[property];
-        }
-        if (Object.keys(userNew).length === allowedKeys.length) {
-          resolve(userNew);
-        }
+    for (var property in user) {
+      if (allowedKeys.indexOf(property) > -1) {
+        userNew[property] = user[property];
       }
-    }));
+      if (Object.keys(userNew).length >= allowedKeys.length) {
+        callback(userNew);
+        return userNew;
+      }
+    }
   }
-  const struct = {
-    user_id: id,
-    counts: {
-      followers: 0,
-      new_followers: 0,
-      unfollowers: 0
-    },
-    followers: []
-  };
   const findOp = { user_id: id };
   // Use connect method to connect to the server
   MongoClient.connect(mongoURL, (err, db) => {
@@ -322,9 +322,7 @@ Services.NewUpdateFollowers = (id, token, secret) => {
                       });
                     }
                     const followerList = struct.followers;
-                    const users = data.users.map((user, index) => {
-                      return filterUserData(user);
-                    });
+                    const users = data.users;
                     struct.followers = followerList.concat(users);
                     cursor = data.next_cursor_str;
                     if (parseInt(cursor) === 0) {
@@ -365,28 +363,37 @@ Services.NewUpdateFollowers = (id, token, secret) => {
             const unfollowerIDs = OldFollowers.diff(NewFollowers);
             const newFollowerIDs = NewFollowers.diff(OldFollowers);
 
-            const metaList = struct.followers.map((item, index) => {
-              let $this = item;
-              $this.metadata = {};
-              if (newFollowerIDs.indexOf(item.id_str) >= 0) {
-                $this.metadata.new_follower = true;
-                $this.metadata.followed_at = new Date().toString();
-                $this.metadata.unfollower = false;
-                return $this;
-              } else if (unfollowerIDs.indexOf(item.id_str) >= 0) {
-                $this.metadata.unfollower = true;
-                $this.metadata.new_follower = false;
-                $this.metadata.unfollowed_at = new Date().toString();
-                return $this;
-              } else {
-                $this.metadata.unfollower = false;
-                $this.metadata.new_follower = false;
-                return $this;
+            const metaList = (struct.followers.map((item, index) => {
+              return filterUserData(item, ($this) => {
+                $this.metadata = {};
+                if (newFollowerIDs.indexOf(item.id_str) >= 0) {
+                  $this.metadata.new_follower = true;
+                  $this.metadata.followed_at = (new Date()).toString();
+                  $this.metadata.unfollower = false;
+                  return $this;
+                } else {
+                  $this.metadata.unfollower = false;
+                  $this.metadata.new_follower = false;
+                  return $this;
+                }
+              });
+            }));
+
+            const unfollowerList = doc.followers.filter((item) => {
+              if (unfollowerIDs.indexOf(item.id_str) >= 0) {
+                return filterUserData(item, ($this) => {
+                  $this.metadata = {};
+                  $this.metadata.unfollower = true;
+                  $this.metadata.new_follower = false;
+                  $this.metadata.unfollowed_at = (new Date()).toString();
+                  return $this;
+                });
               }
             });
 
             struct.counts.new_followers = newFollowerIDs.length;
             struct.counts.unfollowers = unfollowerIDs.length;
+            struct.unfollowers = unfollowerList;
             struct.followers = metaList;
 
             results.findOneAndUpdate(findOp, { $set: struct }, (err2, result1) => {
@@ -395,6 +402,18 @@ Services.NewUpdateFollowers = (id, token, secret) => {
           });
         } else {
           getFollowers(() => {
+            const metaList = (struct.followers.map((item, index) => {
+              return filterUserData(item, ($this) => {
+                $this.metadata = {};
+                $this.metadata.unfollower = false;
+                $this.metadata.new_follower = false;
+                $this.metadata.followed_at = (new Date()).toString();
+                return $this;
+              });
+            }));
+            struct.followers = metaList;
+            struct.counts.unfollowers = 0;
+            struct.counts.new_followers = 0;
             results.insertOne(struct, (err2, res) => {
               db.close();
             });
