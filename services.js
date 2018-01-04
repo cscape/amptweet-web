@@ -132,7 +132,7 @@ if (!debugStatus) {
 
             client.stream('statuses/filter', {
 
-              });
+            });
           }
         }
       }
@@ -142,7 +142,7 @@ if (!debugStatus) {
   console.log('Services failed to start due to debug status.');
 }
 
-Services.OldUpdateFollowers = (id, token, secret) => {
+Services.UpdateFollowers = (id, token, secret) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -205,14 +205,13 @@ Services.OldUpdateFollowers = (id, token, secret) => {
             const NewFollowers = struct.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } 
-                return null;
-              
+              }
+              return null;
             });
             const OldFollowers = doc.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } 
+              }  
                 return null;
               
             });
@@ -252,16 +251,16 @@ Services.OldUpdateFollowers = (id, token, secret) => {
   });
 };
 
-Services.UpdateFollowers = (id, token, secret) => {
+Services.NewUpdateFollowers = (id, token, secret) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
     access_token_key: token,
     access_token_secret: secret
   });
-  function filterUserData(user) {
-    let userNew = {};
-    const allowed_keys = ['id_str',
+  async function filterUserData(user) {
+    const userNew = {};
+    const allowedKeys = ['id_str',
       'name',
       'screen_name',
       'protected',
@@ -278,15 +277,17 @@ Services.UpdateFollowers = (id, token, secret) => {
       'blocked_by',
       'metadata'
     ];
-    for (let property in user) {
-      if (allowed_keys.indexOf(property) > -1) {
-        userNew[property] = user[property];
+    await (new Promise((resolve) => {
+      for (const property in user) {
+        if (allowedKeys.indexOf(property) > -1) {
+          userNew[property] = user[property];
+        }
+        if (Object.keys(userNew).length === allowedKeys.length) {
+          resolve(userNew);
+        }
       }
-      if (Object.keys(userNew).length === allowed_keys.length) {
-        return userNew;
-      }
-    }
-  };
+    }));
+  }
   const struct = {
     user_id: id,
     counts: {
@@ -321,7 +322,7 @@ Services.UpdateFollowers = (id, token, secret) => {
                       });
                     }
                     const followerList = struct.followers;
-                    let users = data.users.map(function(user, index) {
+                    const users = data.users.map((user, index) => {
                       return filterUserData(user);
                     });
                     struct.followers = followerList.concat(users);
@@ -351,44 +352,50 @@ Services.UpdateFollowers = (id, token, secret) => {
             const NewFollowers = struct.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } 
-                return null;
-              
+              }
+              return null;
             });
             const OldFollowers = doc.followers.map((item, index) => {
               if (item.hasOwnProperty('id_str')) {
                 return item.id_str;
-              } 
-                return null;
-              
+              }
+              return null;
             });
 
             const unfollowerIDs = OldFollowers.diff(NewFollowers);
             const newFollowerIDs = NewFollowers.diff(OldFollowers);
 
-            const unfollowerList = doc.followers.filter((item) => {
-              if (unfollowerIDs.indexOf(item.id_str) >= 0) {
-                return item;
-              }
-            });
-            const newFollowerList = struct.followers.filter((item) => {
+            const metaList = struct.followers.map((item, index) => {
+              let $this = item;
+              $this.metadata = {};
               if (newFollowerIDs.indexOf(item.id_str) >= 0) {
-                return item;
+                $this.metadata.new_follower = true;
+                $this.metadata.followed_at = new Date().toString();
+                $this.metadata.unfollower = false;
+                return $this;
+              } else if (unfollowerIDs.indexOf(item.id_str) >= 0) {
+                $this.metadata.unfollower = true;
+                $this.metadata.new_follower = false;
+                $this.metadata.unfollowed_at = new Date().toString();
+                return $this;
+              } else {
+                $this.metadata.unfollower = false;
+                $this.metadata.new_follower = false;
+                return $this;
               }
             });
 
-            struct.unfollowers = unfollowerList;
-            struct.new_followers = newFollowerList;
             struct.counts.new_followers = newFollowerIDs.length;
             struct.counts.unfollowers = unfollowerIDs.length;
+            struct.followers = metaList;
 
-            results.findOneAndReplace(findOp, struct, (err2, result1) => {
+            results.findOneAndUpdate(findOp, { $set: struct }, (err2, result1) => {
               db.close();
             });
           });
         } else {
           getFollowers(() => {
-            results.insertOne(struct, (err, res) => {
+            results.insertOne(struct, (err2, res) => {
               db.close();
             });
           });

@@ -7,7 +7,6 @@ const stylus = require('stylus');
 const userInfo = require('./middleware/get-user-info.js');
 const SocketService = require('socket.io');
 
-
 // Sets the base directory
 global.baseDIR = `${__dirname}/`;
 

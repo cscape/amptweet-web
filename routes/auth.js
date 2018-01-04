@@ -8,7 +8,7 @@ const Services = require(`${baseDIR}services`);
 const mongoURL = process.env.MONGODB_URI;
 const consumerKey = process.env.TWITTER_CONSUMER_KEY;
 const consumerSecret = process.env.TWITTER_CONSUMER_SECRET;
-const rootURL = 'http://amptweet.com';
+const rootURL = process.env.AMPTWEET_ROOT_URL || 'http://amptweet.com';
 const callbackURL = `${rootURL}/auth/twitter/callback`;
 
 const router = express.Router();
@@ -41,12 +41,12 @@ const createUser = function createUser(username, id, token, secret) {
         console.log(JSON.stringify(result));
         if (result) {
           results.findOneAndUpdate(findOp, { $set: struct }, (err, result1) => {
-            Services.UpdateFollowers(id, token, secret);
+            Services.NewUpdateFollowers(id, token, secret);
             db.close();
           });
         } else {
           results.insertOne(struct, (err, res) => {
-            Services.UpdateFollowers(id, token, secret);
+            Services.NewUpdateFollowers(id, token, secret);
             db.close();
           });
         }
