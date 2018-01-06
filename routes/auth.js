@@ -8,7 +8,7 @@ const Services = require(`${baseDIR}services`);
 const mongoURL = process.env.MONGODB_URI;
 const consumerKey = process.env.TWITTER_CONSUMER_KEY;
 const consumerSecret = process.env.TWITTER_CONSUMER_SECRET;
-const rootURL = process.env.AMPTWEET_ROOT_URL || 'http://amptweet.com';
+const rootURL = process.env.AMPTWEET_ROOT_URL || 'https://amptweet.com';
 const callbackURL = `${rootURL}/auth/twitter/callback`;
 
 const router = express.Router();
@@ -22,7 +22,7 @@ const TwitterAuth = new OAuth(
   'HMAC-SHA1'
 );
 
-const createUser = function createUser(username, id, token, secret) {
+const updateUser = function updateUser(username, id, token, secret, callback) {
   const struct = {
     twitter: {
       username,
@@ -41,12 +41,12 @@ const createUser = function createUser(username, id, token, secret) {
         console.log(JSON.stringify(result));
         if (result) {
           results.findOneAndUpdate(findOp, { $set: struct }, (err, result1) => {
-            Services.UpdateFollowers(id, token, secret);
+            Services.UpdateFollowers(id, token, secret, callback);
             db.close();
           });
         } else {
           results.insertOne(struct, (err, res) => {
-            Services.UpdateFollowers(id, token, secret);
+            Services.UpdateFollowers(id, token, secret, callback);
             db.close();
           });
         }
@@ -118,33 +118,35 @@ router.all('/twitter/callback', (req, res) => {
             });
           }
           console.log(`AccessToken-> ${OAuthAccessToken}\r\nAccessSecret->${OAuthAccessTokenSecret}`);
-          createUser(
+          updateUser(
             JSON.parse(twitterResponseData).screen_name,
             JSON.parse(twitterResponseData).id_str,
             OAuthAccessToken,
-            OAuthAccessTokenSecret
+            OAuthAccessTokenSecret,
+            () => {
+              res.status(302)
+                .cookie('twitter_session_token',
+                  Buffer.from(
+                    JSON.stringify({
+                      access_token: OAuthAccessToken,
+                      access_token_secret: OAuthAccessTokenSecret
+                    })
+                  ).toString('base64'), {
+                    expires: 0, // session cookie
+                    httpOnly: true
+                  }
+                )
+                .cookie('twitter_user_id',
+                  JSON.parse(twitterResponseData).id_str, {
+                    expires: 0, // session cookie
+                    httpOnly: false
+                  }
+                )
+                // Redirect to dashboard after successful login
+                .append('Location', `${inrootURL}/dashboard`)
+                .end();
+            }
           );
-          res.status(302)
-            .cookie('twitter_session_token',
-              Buffer.from(
-                JSON.stringify({
-                  access_token: OAuthAccessToken,
-                  access_token_secret: OAuthAccessTokenSecret
-                })
-              ).toString('base64'), {
-                expires: 0, // session cookie
-                httpOnly: true
-              }
-            )
-            .cookie('twitter_user_id',
-              JSON.parse(twitterResponseData).id_str, {
-                expires: 0, // session cookie
-                httpOnly: false
-              }
-            )
-            // Redirect to dashboard after successful login
-            .append('Location', `${inrootURL }/dashboard`)
-            .end();
         });
     }
   );

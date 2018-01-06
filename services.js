@@ -251,7 +251,7 @@ Services.UpdateFollowers = (id, token, secret) => {
   });
 };
 
-Services.UpdateFollowers = (id, token, secret) => {
+Services.UpdateFollowers = (id, token, secret, callback) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -398,6 +398,7 @@ Services.UpdateFollowers = (id, token, secret) => {
 
             results.findOneAndUpdate(findOp, { $set: struct }, (err2, result1) => {
               db.close();
+              callback(struct);
             });
           });
         } else {
@@ -416,6 +417,7 @@ Services.UpdateFollowers = (id, token, secret) => {
             struct.counts.new_followers = 0;
             results.insertOne(struct, (err2, res) => {
               db.close();
+              callback(struct);
             });
           });
         }
