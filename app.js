@@ -34,6 +34,7 @@ app.use(stylus.middleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(userInfo);
 
+app.use('/favicon*', express.static(path.join(__dirname, 'public/images/favicon.ico')));
 app.use('/', pageRoutes('index'));
 app.use('/api', pageRoutes('api'));
 app.use('/auth', pageRoutes('auth'));

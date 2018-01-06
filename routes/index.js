@@ -11,7 +11,7 @@ router.get('/', (req, res) => {
     });
   } else {
     res.cookie('hosted_on', `https://${req.header('Host')}`)
-      .render('index', { title: 'Welcome' });
+      .render('index');
   }
 });
 
