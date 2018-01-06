@@ -7,19 +7,18 @@ block content
     ng-controller="dashHead as ctrl" layout="column" layout-padding)
     .md-display-1 Dashboard
     ul.collapsed.followerStats
-      li._mrxs
-        span(ng-hide="ctrl.followerCount >= 0") Loading followers...
-        span(ng-show="ctrl.followerCount >= 0")
+      li._mrxs(ng-hide="ctrl.followerCount >= 0 && ctrl.newFollowerCount >= 0 && ctrl.unfollowerCount  >= 0")
+        span Loading follower data...
+      li._mrxs(ng-show="ctrl.followerCount > 0")
+        span
           b {{ctrl.followerCount}}
           |  Followers
-      li._mrxs
-        span(ng-hide="ctrl.newFollowerCount >= 0") Loading new followers...
-        span(ng-show="ctrl.newFollowerCount >= 0")
+      li._mrxs(ng-show="ctrl.newFollowerCount > 0")
+        span
           b {{ctrl.newFollowerCount}}
           |  New Followers
-      li
-        span(ng-hide="ctrl.unfollowerCount >= 0") Loading unfollowers...
-        span(ng-show="ctrl.unfollowerCount >= 0")
+      li(ng-show="ctrl.unfollowerCount > 0")
+        span
           b {{ctrl.unfollowerCount}}
           |  Unfollowers
   md-card.layoutCard(layout-margin layout-padding
@@ -37,7 +36,7 @@ block content
         | like Tweets. Proceed at your own risk.
   md-card.layoutCard(layout-margin layout-padding
     layout="column" ng-controller="newfollowerCtrl as ctrl"
-    ng-show="ctrl.show")
+    ng-show="ctrl.show && ctrl.newfollowers.length")
     md-card-title
       md-card-title-text
         span.md-headline New Followers
