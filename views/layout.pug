@@ -64,6 +64,10 @@ html
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'UA-112001223-1');
+      if user
+        script.
+          // Set the user ID using signed-in user_id.
+          gtag('set', {'user_id': '#{user.profile.id}'});
   body(ng-app="AmpTweet" ng-cloak layout='column')
     block header
       +Header
