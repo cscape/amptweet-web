@@ -57,6 +57,13 @@ html
       script(type='text/javascript',  src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.5/angular-material.min.js" integrity="sha256-V4+TCuIl+iFDamH1NvVE0brCN3ES0BfSGmVKC7dFgPQ=" crossorigin="anonymous")
       script(type='text/javascript',  src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin='anonymous')
       script(type='text/javascript',  src='/scripts/default.js')
+      // Global site tag (gtag.js) - Google Analytics
+      script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-112001223-1')
+      script.
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-112001223-1');
   body(ng-app="AmpTweet" ng-cloak layout='column')
     block header
       +Header
