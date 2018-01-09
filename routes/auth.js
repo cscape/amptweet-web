@@ -3,7 +3,7 @@ const OAuth = require('oauth').OAuth;
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
-const Services = require(`${global.baseDIR}services`);
+const Services = require('../services');
 
 const mongoURL = process.env.MONGODB_URI;
 const consumerKey = process.env.TWITTER_CONSUMER_KEY;
@@ -38,12 +38,14 @@ const updateUser = function updateUser(username, id, token, secret, callback) {
     db.createCollection('users', (err2, results) => {
       results.findOne(findOp, (err3, result) => {
         if (result) {
-          results.findOneAndUpdate(findOp, { $set: struct }, (err4, result1) => {
+          results.findOneAndUpdate(findOp, { $set: struct }, (err4) => {
+            if (err4) throw err4;
             Services.UpdateFollowers(id, token, secret, callback);
             db.close();
           });
         } else {
-          results.insertOne(struct, (err5, res) => {
+          results.insertOne(struct, (err5) => {
+            if (err5) throw err5;
             Services.UpdateFollowers(id, token, secret, callback);
             db.close();
           });
@@ -57,7 +59,7 @@ const updateUser = function updateUser(username, id, token, secret, callback) {
 router.all('/twitter/redirect', (req, res) => {
   const incookieURL = req.cookies.hosted_on;
   const inrootURL = typeof incookieURL === 'undefined' ? 'https://amptweet.com' : incookieURL;
-  TwitterAuth.getOAuthRequestToken((error, OAuthToken, OAuthTokenSecret, results) => {
+  TwitterAuth.getOAuthRequestToken((error, OAuthToken, OAuthTokenSecret) => {
     TwitterAuth.data = {
       OAuthToken,
       OAuthTokenSecret,
@@ -75,7 +77,7 @@ router.all('/twitter/callback', (req, res) => {
   const inrootURL = typeof incookieURL === 'undefined' ? 'https://amptweet.com' : incookieURL;
   return TwitterAuth.getOAuthAccessToken(req.query.oauth_token,
     TwitterAuth.data.OAuthTokenSecret, req.query.oauth_verifier,
-    (error, OAuthAccessToken, OAuthAccessTokenSecret, results) => {
+    (error, OAuthAccessToken, OAuthAccessTokenSecret) => {
       if (error) {
         res.render('error', {
           title: 'AmpTweet',
@@ -91,7 +93,7 @@ router.all('/twitter/callback', (req, res) => {
       return TwitterAuth.get('https://api.twitter.com/1.1/account/verify_credentials.json',
         OAuthAccessToken,
         OAuthAccessTokenSecret,
-        (error2, twitterResponseData, result) => {
+        (error2, twitterResponseData) => {
           if (error) {
             res.render('error', {
               title: 'AmpTweet',

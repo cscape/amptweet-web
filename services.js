@@ -3,17 +3,20 @@ const assert = require('assert');
 const Twitter = require('twitter');
 
 const mongoURL = process.env.MONGODB_URI;
-const Services = {};
+const Services = {
+  UpdateFollowers: () => {}
+};
 const debugStatus = typeof v8debug === 'object'
   || /--debug|--inspect/.test(process.execArgv.join(' '));
 
-Array.prototype.diff = function (compareToArray) {
-  return this.filter(i => compareToArray.indexOf(i) < 0);
-};
+/** Compares two arrays and returns the overlapping values
+ * @param {array} one The array to be compared from
+ * @param {array} two The array to be compared to
+ * @returns {array} Array including only common values in both one and two.
+ */
+const arrayDiff = (one, two) => one.filter(i => two.indexOf(i) < 0);
 
 if (!debugStatus) {
-  console.log('Services started.');
-
   (function AutoLiker() {
     /** Twitter Accounts Tracker
      * @description Keeps track of all accounts and
@@ -31,38 +34,6 @@ if (!debugStatus) {
         return true;
       }
     };
-
-    /** MongoDB filtering query
-     * @description This filter selects only
-     * users with the autolike service turned on.
-     */
-    const query = { 'services.autolike': true };
-    /** @desc Interval is used to check for updates */
-    let dbInterval;
-    MongoClient.connect(mongoURL, (err, db) => {
-      /** @desc Ensures no errors occurred */
-      assert.equal(null, err);
-      /** Opens users collection in database */
-      db.collection('users', (err, collection) => {
-        dbInterval = setInterval(() => {
-          collection.find(query, (err, docs) => {
-            tracker.reset();
-            docs.forEach((doc, index) => {
-              tracker.accounts[doc.twitter.id] = {
-                accessToken: doc.twitter.accessToken,
-                accessTokenSecret: doc.twitter.accessTokenSecret,
-                enabled: true
-              };
-              initLiker({
-                accessToken: doc.twitter.accessToken,
-                accessTokenSecret: doc.twitter.accessTokenSecret,
-                id: doc.twitter.id
-              }, false);
-            });
-          });
-        }, 15e3);
-      });
-    });
 
     /** Initiate Liker Service
      * @desc Initiates the autoliker service for a specified user.
@@ -84,26 +55,23 @@ if (!debugStatus) {
        * @return {null} Doesn't return anything.
        */
       function checkTL() {
-        console.log(`Sent request for ${credentials.id}`);
         client.get('statuses/home_timeline', {
           count: 15, since_id: lastTweet, include_entities: false
         }, (error, tweets, response) => {
-          console.log(`Got response for ${credentials.id}`);
-          if (!error) {
+          if (!error && response) {
             const tweet = tweets[0];
             lastTweet = tweet.id_str;
             if (tweet.user.id_str !== credentials.id
              && tweet.favorited !== true) {
               client.post('favorites/create', {
                 id: tweet.id_str, include_entities: false
-              }, (error, tweet, response) => {
-                console.log(`Got LIKE response for ${credentials.id}`);
-                if (error) console.error(error);
-                else console.log(`Liked ${tweet.id_str}`);
+              }, (err, likedTweets, rawdata) => {
+                if (err) console.error(err);
+                else if (rawdata && likedTweets);
               });
             }
           } else {
-            console.log(error);
+            console.error(error);
           }
         });
       }
@@ -113,7 +81,7 @@ if (!debugStatus) {
 
         if (tracker.accounts[credentials.id] && tracker.accounts[credentials.id].enabled === true) {
           if (tracker.accounts[credentials.id].instances) {
-            tracker.accounts[credentials.id].instances[0]++;
+            tracker.accounts[credentials.id].instances[0] += 1;
             clearInterval(interval);
           } else if (!tracker.accounts[credentials.id].instances) {
             tracker.accounts[credentials.id].instances = [0];
@@ -125,7 +93,7 @@ if (!debugStatus) {
       } else if (useStream === true) {
         if (tracker.accounts[credentials.id] && tracker.accounts[credentials.id].enabled === true) {
           if (tracker.accounts[credentials.id].instances) {
-            tracker.accounts[credentials.id].instances[0]++;
+            tracker.accounts[credentials.id].instances[0] += 1;
           } else if (!tracker.accounts[credentials.id].instances) {
             tracker.accounts[credentials.id].instances = [0];
               // OK to go
@@ -137,291 +105,268 @@ if (!debugStatus) {
         }
       }
     }
+
+    /** MongoDB filtering query
+     * @description This filter selects only
+     * users with the autolike service turned on.
+     */
+    const query = { 'services.autolike': true };
+    MongoClient.connect(mongoURL, (err, db) => {
+      /** @desc Ensures no errors occurred */
+      assert.equal(null, err);
+      /** Opens users collection in database */
+      db.collection('users', (err2, collection) => {
+        setInterval(() => {
+          collection.find(query, (err3, docs) => {
+            tracker.reset();
+            docs.forEach((doc) => {
+              tracker.accounts[doc.twitter.id] = {
+                accessToken: doc.twitter.accessToken,
+                accessTokenSecret: doc.twitter.accessTokenSecret,
+                enabled: true
+              };
+              initLiker({
+                accessToken: doc.twitter.accessToken,
+                accessTokenSecret: doc.twitter.accessTokenSecret,
+                id: doc.twitter.id
+              }, false);
+            });
+          });
+        }, 15e3);
+      });
+    });
   }());
 } else {
   console.log('Services failed to start due to debug status.');
 }
 
-Services.UpdateFollowers = (id, token, secret) => {
-  const client = new Twitter({
-    consumer_key: process.env.TWITTER_CONSUMER_KEY,
-    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    access_token_key: token,
-    access_token_secret: secret
+Services.UpdateFollowers.filterUserData = (user, callback1) => {
+  const allowedKeys = [
+    'id_str',
+    'name',
+    'screen_name',
+    'protected',
+    'followers_count',
+    'friends_count',
+    'created_at',
+    'favourites_count',
+    'lang',
+    'profile_image_url_https',
+    'following',
+    'follow_request_sent',
+    'muting',
+    'blocking',
+    'blocked_by'
+  ];
+  return callback1(
+    Object.keys(user).map((property) => {
+      if (allowedKeys.indexOf(property) > -1) return user[property];
+      return undefined;
+    })
+  );
+};
+
+Services.UpdateFollowers.struct = {
+  user_id: 0,
+  counts: {
+    followers: 0,
+    new_followers: 0,
+    unfollowers: 0
+  },
+  unfollowers: [],
+  followers: []
+};
+
+Services.UpdateFollowers.connectDB = (callback) => {
+  MongoClient.connect(mongoURL, (err, dbObject) => {
+    if (err) throw err;
+    else callback(dbObject);
   });
-  const struct = {
-    user_id: id,
-    counts: {
-      followers: 0,
-      new_followers: 0,
-      unfollowers: 0
-    },
-    followers: [],
-    unfollowers: [],
-    new_followers: []
-  };
-  const findOp = { user_id: id };
-  // Use connect method to connect to the server
-  MongoClient.connect(mongoURL, (err, db) => {
-    assert.equal(null, err);
-    db.createCollection('twitter-stats', (err, results) => {
-      results.findOne(findOp, (err, doc) => {
-        const getFollowers = function (callback) {
-          /** Gets followers list from Twitter */
-          this.getList = (callback) => {
-            let cursor = -1;
-            function repeatList() {
-              client.get('followers/list',
-                { user_id: id,
-                  cursor,
-                  count: 200,
-                  skip_status: true,
-                  include_user_entities: false }, (err, data, raw) => {
-                    const followerList = struct.followers;
-                    struct.followers = followerList.concat(data.users);
-                    cursor = data.next_cursor_str;
-                    if (parseInt(cursor) === 0) {
-                      callback();
-                    } else {
-                      repeatList();
-                    }
-                  });
-            }
-            repeatList();
-          };
-          this.getCount = (callback) => {
-            client.get('users/show', { user_id: id }, function (err, data) {
-              struct.counts.followers = data.followers_count;
-              this.getList(callback);
-            });
-          };
-          // Initiates getFollowers.getCount() when getFollowers() is called
-          this.getCount(callback);
-        };
+};
 
-        if (doc) {
-          getFollowers(() => {
-            // ["398233278", "7328737129401", "438792910", etc...]
-            const NewFollowers = struct.followers.map((item, index) => {
-              if (item.hasOwnProperty('id_str')) {
-                return item.id_str;
-              }
-              return null;
-            });
-            const OldFollowers = doc.followers.map((item, index) => {
-              if (item.hasOwnProperty('id_str')) {
-                return item.id_str;
-              }  
-                return null;
-              
-            });
+Services.UpdateFollowers.twitterCollection = (dbObject, callback) => {
+  dbObject.createCollection('twitter-stats', (err, collectionObject) => {
+    if (err) throw err;
+    else callback(collectionObject);
+  });
+};
 
-            const unfollowerIDs = OldFollowers.diff(NewFollowers);
-            const newFollowerIDs = NewFollowers.diff(OldFollowers);
+Services.UpdateFollowers.findInDatabase = (collectionObject, findOptions, callback) => {
+  collectionObject.findOne(findOptions, (err, doc) => {
+    if (err) throw err;
+    else callback(doc);
+  });
+};
 
-            const unfollowerList = doc.followers.filter((item) => {
-              if (unfollowerIDs.indexOf(item.id_str) >= 0) {
-                return item;
-              }
-            });
-            const newFollowerList = struct.followers.filter((item) => {
-              if (newFollowerIDs.indexOf(item.id_str) >= 0) {
-                return item;
-              }
-            });
-
-            struct.unfollowers = unfollowerList;
-            struct.new_followers = newFollowerList;
-            struct.counts.new_followers = newFollowerIDs.length;
-            struct.counts.unfollowers = unfollowerIDs.length;
-
-            results.findOneAndUpdate(findOp, { $set: struct }, (err, result1) => {
-              db.close();
-            });
-          });
-        } else {
-          getFollowers(() => {
-            results.insertOne(struct, (err, res) => {
-              db.close();
-            });
-          });
-        }
+Services.UpdateFollowers.DBHandler = (findOptions, callback) => {
+  const dbHandlers = Services.UpdateFollowers;
+  dbHandlers.connectDB((dbObject) => {
+    dbHandlers.twitterCollection(dbObject, (collectionObject) => {
+      dbHandlers.findInDatabase(collectionObject, findOptions, (doc) => {
+        callback(doc, collectionObject, dbObject);
       });
     });
   });
 };
 
-Services.UpdateFollowers = (id, token, secret, callback) => {
+/** Gets followers list from Twitter
+ * @param {object[]} client A new instance of a Twitter object.
+ * @param {number} userID The user ID of a Twitter user.
+ * @param {function} callback The callback function
+ * @returns {void} Does not return anything
+ */
+Services.UpdateFollowers.getFollowers = (client, userID, callback) => {
+  const $this = this;
+  $this.getCount(client, userID, () => {
+    $this.getList(client, userID, (followerList) => {
+      callback(followerList);
+    });
+  });
+};
+
+Services.UpdateFollowers.getFollowers.getCount = (client, userID, callback) => {
+  client.get('users/show', { user_id: userID }, (err, data) => {
+    Services.UpdateFollowers.struct.counts.followers = data.followers_count;
+    callback(client, userID, data);
+  });
+};
+
+Services.UpdateFollowers.getFollowers.getList = (client, userID, callback) => {
+  let cursor = -1;
+  const struct = Services.UpdateFollowers.struct;
+  const repeatList = () => {
+    const options = {
+      user_id: userID,
+      cursor,
+      count: 200,
+      skip_status: true,
+      include_user_entities: false
+    };
+    client.get('followers/list', options, (err, data) => {
+      if (err) throw err;
+
+      const followerList = struct.followers;
+      struct.followers = followerList.concat(data.users);
+      cursor = data.next_cursor_str;
+
+      // Checks to see if there's no more pages of followers left
+      if (parseInt(cursor, 10) === 0) callback(struct.followers);
+      else repeatList();
+    });
+  };
+  repeatList();
+};
+
+Services.UpdateFollowers.metaFollowerSort = (doc, callback) => {
+  const struct = Services.UpdateFollowers.struct;
+  const NewFollowers = struct.followers.map((item) => {
+    if (item.id_str) return item.id_str;
+    return null;
+  });
+  const OldFollowers = doc.followers.map((item) => {
+    if (item.id_str) return item.id_str;
+    return null;
+  });
+
+  const unfollowerIDs = arrayDiff(OldFollowers, NewFollowers);
+  const newFollowerIDs = arrayDiff(NewFollowers, OldFollowers);
+
+  Services.UpdateFollowers.createMeta(unfollowerIDs, newFollowerIDs, doc,
+  (followerList, unfollowerList) => {
+    callback(followerList, unfollowerList, newFollowerIDs.length, unfollowerIDs.length);
+  });
+};
+
+Services.UpdateFollowers.createMeta = (unfollowerIDs, newFollowerIDs, doc, callback) => {
+  const followerList = Services.UpdateFollowers.followers.map((item) => {
+    Services.UpdateFollowers.filterUserData(item, (user) => {
+      const $this = user;
+      $this.metadata = {};
+      if (newFollowerIDs.indexOf(item.id_str) >= 0) {
+        $this.metadata.new_follower = true;
+        $this.metadata.followed_at = (new Date()).toString();
+        $this.metadata.unfollower = false;
+        return $this;
+      }
+      $this.metadata.unfollower = false;
+      $this.metadata.new_follower = false;
+      return $this;
+    });
+    return null;
+  });
+  const unfollowerList = doc.followers.filter((item) => {
+    if (unfollowerIDs.indexOf(item.id_str) >= 0) {
+      Services.UpdateFollowers.filterUserData(item, (user) => {
+        const $this = user;
+        $this.metadata = {};
+        $this.metadata.unfollower = true;
+        $this.metadata.new_follower = false;
+        $this.metadata.unfollowed_at = (new Date()).toString();
+        return $this;
+      });
+    }
+    return null;
+  });
+  callback(followerList, unfollowerList);
+};
+
+Services.UpdateFollowers.followSort = (doc, collectionObject, callback) => {
+  const struct = Services.UpdateFollowers.struct;
+  const userID = Services.UpdateFollowers.struct.user_id;
+  Services.UpdateFollowers.metaFollowerSort(doc, (followerList, unfollowerList,
+    newFollowerIDs, unfollowerIDs) => {
+    struct.counts.new_followers = newFollowerIDs;
+    struct.counts.unfollowers = unfollowerIDs;
+    struct.unfollowers = unfollowerList;
+    struct.followers = followerList;
+    collectionObject.findOneAndUpdate({ user_id: userID }, { $set: struct }, (err, response) => {
+      if (err) throw err;
+      callback(struct, response);
+    });
+  });
+};
+
+Services.UpdateFollowers.followSortNew = (collectionObject, callback) => {
+  const struct = Services.UpdateFollowers.struct;
+  const metaList = (struct.followers.map((item) => {
+    Services.UpdateFollowers.filterUserData(item, (user) => {
+      const $this = user;
+      $this.metadata = {};
+      $this.metadata.unfollower = false;
+      $this.metadata.new_follower = false;
+      $this.metadata.followed_at = (new Date()).toString();
+      return $this;
+    });
+    return undefined;
+  }));
+  struct.followers = metaList;
+  struct.counts.unfollowers = 0;
+  struct.counts.new_followers = 0;
+  collectionObject.insertOne(struct, (err, response) => {
+    if (err) throw err;
+    else callback(struct, response);
+  });
+};
+
+Services.UpdateFollowers = (userID, token, secret, callback) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
     access_token_key: token,
     access_token_secret: secret
   });
-  const struct = {
-    user_id: id,
-    counts: {
-      followers: 0,
-      new_followers: 0,
-      unfollowers: 0
-    },
-    unfollowers: [],
-    followers: []
-  };
-  function filterUserData(user, callback) {
-    let userNew = {};
-    const allowedKeys = [
-      'id_str',
-      'name',
-      'screen_name',
-      'protected',
-      'followers_count',
-      'friends_count',
-      'created_at',
-      'favourites_count',
-      'lang',
-      'profile_image_url_https',
-      'following',
-      'follow_request_sent',
-      'muting',
-      'blocking',
-      'blocked_by'
-    ];
-    for (var property in user) {
-      if (allowedKeys.indexOf(property) > -1) {
-        userNew[property] = user[property];
-      }
-      if (Object.keys(userNew).length >= allowedKeys.length) {
-        callback(userNew);
-        return userNew;
-      }
-    }
-  }
-  const findOp = { user_id: id };
+  const struct = Services.UpdateFollowers.struct;
+  struct.user_id = userID;
+
   // Use connect method to connect to the server
-  MongoClient.connect(mongoURL, (err, db) => {
-    assert.equal(null, err);
-    db.createCollection('twitter-stats', (err, results) => {
-      results.findOne(findOp, (err, doc) => {
-        const getFollowers = function (callback) {
-          /** Gets followers list from Twitter */
-          this.getList = (callback) => {
-            let cursor = -1;
-            function repeatList() {
-              client.get('followers/list',
-                { user_id: id,
-                  cursor,
-                  count: 200,
-                  skip_status: true,
-                  include_user_entities: false }, (err, data, raw) => {
-                    if (err) {
-                      throw ({
-                        status: 500,
-                        message: err.errors,
-                        render: false
-                      });
-                    }
-                    const followerList = struct.followers;
-                    const users = data.users;
-                    struct.followers = followerList.concat(users);
-                    cursor = data.next_cursor_str;
-                    if (parseInt(cursor) === 0) {
-                      callback();
-                    } else {
-                      repeatList();
-                    }
-                  });
-            }
-            repeatList();
-          };
-          this.getCount = (callback) => {
-            client.get('users/show', { user_id: id }, function (err, data) {
-              struct.counts.followers = data.followers_count;
-              this.getList(callback);
-            });
-          };
-          // Initiates getFollowers.getCount() when getFollowers() is called
-          this.getCount(callback);
-        };
-
-        if (doc) {
-          getFollowers(() => {
-            // ["398233278", "7328737129401", "438792910", etc...]
-            const NewFollowers = struct.followers.map((item, index) => {
-              if (item.hasOwnProperty('id_str')) {
-                return item.id_str;
-              }
-              return null;
-            });
-            const OldFollowers = doc.followers.map((item, index) => {
-              if (item.hasOwnProperty('id_str')) {
-                return item.id_str;
-              }
-              return null;
-            });
-
-            const unfollowerIDs = OldFollowers.diff(NewFollowers);
-            const newFollowerIDs = NewFollowers.diff(OldFollowers);
-
-            const metaList = (struct.followers.map((item, index) => {
-              return filterUserData(item, ($this) => {
-                $this.metadata = {};
-                if (newFollowerIDs.indexOf(item.id_str) >= 0) {
-                  $this.metadata.new_follower = true;
-                  $this.metadata.followed_at = (new Date()).toString();
-                  $this.metadata.unfollower = false;
-                  return $this;
-                } else {
-                  $this.metadata.unfollower = false;
-                  $this.metadata.new_follower = false;
-                  return $this;
-                }
-              });
-            }));
-
-            const unfollowerList = doc.followers.filter((item) => {
-              if (unfollowerIDs.indexOf(item.id_str) >= 0) {
-                return filterUserData(item, ($this) => {
-                  $this.metadata = {};
-                  $this.metadata.unfollower = true;
-                  $this.metadata.new_follower = false;
-                  $this.metadata.unfollowed_at = (new Date()).toString();
-                  return $this;
-                });
-              }
-            });
-
-            struct.counts.new_followers = newFollowerIDs.length;
-            struct.counts.unfollowers = unfollowerIDs.length;
-            struct.unfollowers = unfollowerList;
-            struct.followers = metaList;
-
-            results.findOneAndUpdate(findOp, { $set: struct }, (err2, result1) => {
-              db.close();
-              callback(struct);
-            });
-          });
-        } else {
-          getFollowers(() => {
-            const metaList = (struct.followers.map((item, index) => {
-              return filterUserData(item, ($this) => {
-                $this.metadata = {};
-                $this.metadata.unfollower = false;
-                $this.metadata.new_follower = false;
-                $this.metadata.followed_at = (new Date()).toString();
-                return $this;
-              });
-            }));
-            struct.followers = metaList;
-            struct.counts.unfollowers = 0;
-            struct.counts.new_followers = 0;
-            results.insertOne(struct, (err2, res) => {
-              db.close();
-              callback(struct);
-            });
-          });
-        }
-      });
+  Services.UpdateFollowers.DBHandler({ user_id: userID }, (doc, collectionObject) => {
+    Services.UpdateFollowers.getFollowers(client, userID, () => {
+      if (doc) Services.UpdateFollowers.followSort(doc, collectionObject, () => callback());
+      else {
+        Services.UpdateFollowers.followSortNew(collectionObject, collectionObject, () => {
+          callback();
+        });
+      }
     });
   });
 };
