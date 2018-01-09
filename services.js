@@ -49,6 +49,7 @@ if (!debugStatus) {
         access_token_key: credentials.accessToken,
         access_token_secret: credentials.accessTokenSecret
       });
+      let interval;
       let lastTweet;
 
       /** Check Twitter Timeline
@@ -66,8 +67,24 @@ if (!debugStatus) {
               client.post('favorites/create', {
                 id: tweet.id_str, include_entities: false
               }, (err, likedTweets, rawdata) => {
-                if (err) console.error(err);
-                else if (rawdata && likedTweets);
+                if (err) {
+                  switch (err[0].code) {
+                    case 89: // Invalid/expired token, delete from DB
+                      clearInterval(interval);
+                      break;
+                    case 32: // Could not authenticate, delete from DB
+                      clearInterval(interval);
+                      break;
+                    case 326: // Locked account, delete from DB
+                      clearInterval(interval);
+                      break;
+                    case 88: // Rate limit exceeded
+                      break;
+                    default: // other errors
+                      console.error(err);
+                      break;
+                  }
+                } else if (rawdata && likedTweets);
               });
             }
           } else {
@@ -77,7 +94,7 @@ if (!debugStatus) {
       }
 
       if (useStream === false) {
-        const interval = setInterval(() => { checkTL(); }, 600000); // every 6 minutes
+        interval = setInterval(() => { checkTL(); }, 900000); // every 9 minutes
 
         if (tracker.accounts[credentials.id] && tracker.accounts[credentials.id].enabled === true) {
           if (tracker.accounts[credentials.id].instances) {
