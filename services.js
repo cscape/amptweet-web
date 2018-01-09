@@ -68,7 +68,7 @@ if (!debugStatus) {
                 id: tweet.id_str, include_entities: false
               }, (err, likedTweets, rawdata) => {
                 if (err) {
-                  switch (err[0].code) {
+                  switch (err.code) {
                     case 89: // Invalid/expired token, delete from DB
                       clearInterval(interval);
                       break;
