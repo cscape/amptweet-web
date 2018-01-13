@@ -40,13 +40,13 @@ const updateUser = function updateUser(username, id, token, secret, callback) {
         if (result) {
           results.findOneAndUpdate(findOp, { $set: struct }, (err4) => {
             if (err4) throw err4;
-            Services.UpdateFollowers(id, token, secret, callback);
+            Services.UpdateFollowers(id, token, secret, () => { callback(); });
             db.close();
           });
         } else {
           results.insertOne(struct, (err5) => {
             if (err5) throw err5;
-            Services.UpdateFollowers(id, token, secret, callback);
+            Services.UpdateFollowers(id, token, secret, () => { callback(); });
             db.close();
           });
         }
@@ -60,6 +60,17 @@ router.all('/twitter/redirect', (req, res) => {
   const incookieURL = req.cookies.hosted_on;
   const inrootURL = typeof incookieURL === 'undefined' ? 'https://amptweet.com' : incookieURL;
   TwitterAuth.getOAuthRequestToken((error, OAuthToken, OAuthTokenSecret) => {
+    if (error) {
+      res.render('error', {
+        title: 'AmpTweet',
+        message: 'Error occured while getting request token',
+        error: {
+          status: '500',
+          stack: error
+        }
+      });
+      return false;
+    }
     TwitterAuth.data = {
       OAuthToken,
       OAuthTokenSecret,
@@ -94,7 +105,7 @@ router.all('/twitter/callback', (req, res) => {
         OAuthAccessToken,
         OAuthAccessTokenSecret,
         (error2, twitterResponseData) => {
-          if (error) {
+          if (error2) {
             res.render('error', {
               title: 'AmpTweet',
               message: 'Error occured while verifying credentias',

@@ -3,9 +3,9 @@ const assert = require('assert');
 const Twitter = require('twitter');
 
 const mongoURL = process.env.MONGODB_URI;
-const Services = {
-  UpdateFollowers: () => {}
-};
+const Services = {};
+Services.UpdateFollowersData = {};
+
 const debugStatus = typeof v8debug === 'object'
   || /--debug|--inspect/.test(process.execArgv.join(' '));
 
@@ -67,28 +67,26 @@ if (!debugStatus) {
               client.post('favorites/create', {
                 id: tweet.id_str, include_entities: false
               }, (err, likedTweets, rawdata) => {
-                if (err) {
-                  switch (err.code) {
-                    case 89: // Invalid/expired token, delete from DB
-                      clearInterval(interval);
-                      break;
-                    case 32: // Could not authenticate, delete from DB
-                      clearInterval(interval);
-                      break;
-                    case 326: // Locked account, delete from DB
-                      clearInterval(interval);
-                      break;
-                    case 88: // Rate limit exceeded
-                      break;
-                    default: // other errors
-                      console.error(err);
-                      break;
-                  }
-                } else if (rawdata && likedTweets);
+                if (rawdata && likedTweets);
               });
             }
           } else {
-            console.error(error);
+            switch (error.code) {
+              case 89: // Invalid/expired token, delete from DB
+                clearInterval(interval);
+                break;
+              case 32: // Could not authenticate, delete from DB
+                clearInterval(interval);
+                break;
+              case 326: // Locked account, delete from DB
+                clearInterval(interval);
+                break;
+              case 88: // Rate limit exceeded
+                break;
+              default: // other errors
+                console.error(error);
+                break;
+            }
           }
         });
       }
@@ -157,7 +155,8 @@ if (!debugStatus) {
   console.log('Services failed to start due to debug status.');
 }
 
-Services.UpdateFollowers.filterUserData = (user, callback1) => {
+Services.UpdateFollowersData.filterUserData = (user, callback1) => {
+  const $finalUser = {};
   const allowedKeys = [
     'id_str',
     'name',
@@ -175,48 +174,54 @@ Services.UpdateFollowers.filterUserData = (user, callback1) => {
     'blocking',
     'blocked_by'
   ];
-  return callback1(
-    Object.keys(user).map((property) => {
-      if (allowedKeys.indexOf(property) > -1) return user[property];
-      return undefined;
-    })
-  );
+  Object.keys(user).forEach((property) => {
+    if (allowedKeys.indexOf(property) > -1) {
+      $finalUser[property] = user[property];
+    }
+    if (Object.keys($finalUser).length >= allowedKeys.length) {
+      callback1($finalUser);
+    }
+  });
 };
 
-Services.UpdateFollowers.struct = {
-  user_id: 0,
-  counts: {
-    followers: 0,
-    new_followers: 0,
-    unfollowers: 0
-  },
-  unfollowers: [],
-  followers: []
+Services.UpdateFollowersData.Struct = class Struct {
+  constructor() {
+    this.struct = {
+      user_id: 0,
+      counts: {
+        followers: 0,
+        new_followers: 0,
+        unfollowers: 0
+      },
+      unfollowers: [],
+      followers: []
+    };
+  }
 };
 
-Services.UpdateFollowers.connectDB = (callback) => {
+Services.UpdateFollowersData.connectDB = (callback) => {
   MongoClient.connect(mongoURL, (err, dbObject) => {
     if (err) throw err;
     else callback(dbObject);
   });
 };
 
-Services.UpdateFollowers.twitterCollection = (dbObject, callback) => {
+Services.UpdateFollowersData.twitterCollection = (dbObject, callback) => {
   dbObject.createCollection('twitter-stats', (err, collectionObject) => {
     if (err) throw err;
     else callback(collectionObject);
   });
 };
 
-Services.UpdateFollowers.findInDatabase = (collectionObject, findOptions, callback) => {
+Services.UpdateFollowersData.findInDatabase = (collectionObject, findOptions, callback) => {
   collectionObject.findOne(findOptions, (err, doc) => {
     if (err) throw err;
     else callback(doc);
   });
 };
 
-Services.UpdateFollowers.DBHandler = (findOptions, callback) => {
-  const dbHandlers = Services.UpdateFollowers;
+Services.UpdateFollowersData.DBHandler = (findOptions, callback) => {
+  const dbHandlers = Services.UpdateFollowersData;
   dbHandlers.connectDB((dbObject) => {
     dbHandlers.twitterCollection(dbObject, (collectionObject) => {
       dbHandlers.findInDatabase(collectionObject, findOptions, (doc) => {
@@ -232,25 +237,24 @@ Services.UpdateFollowers.DBHandler = (findOptions, callback) => {
  * @param {function} callback The callback function
  * @returns {void} Does not return anything
  */
-Services.UpdateFollowers.getFollowers = (client, userID, callback) => {
-  const $this = this;
-  $this.getCount(client, userID, () => {
-    $this.getList(client, userID, (followerList) => {
-      callback(followerList);
+Services.UpdateFollowersData.getFollowers = (client, struct, userID, callback) => {
+  Services.UpdateFollowersData.getFollowerCount(client, struct, userID, (newStruct) => {
+    Services.UpdateFollowersData.getFollowerList(client, newStruct, userID, (followerList,
+      struct2) => {
+      callback(followerList, struct2);
     });
   });
 };
 
-Services.UpdateFollowers.getFollowers.getCount = (client, userID, callback) => {
+Services.UpdateFollowersData.getFollowerCount = (client, struct, userID, callback) => {
   client.get('users/show', { user_id: userID }, (err, data) => {
-    Services.UpdateFollowers.struct.counts.followers = data.followers_count;
-    callback(client, userID, data);
+    struct.counts.followers = data.followers_count;
+    callback(struct);
   });
 };
 
-Services.UpdateFollowers.getFollowers.getList = (client, userID, callback) => {
+Services.UpdateFollowersData.getFollowerList = (client, newStruct, userID, callback) => {
   let cursor = -1;
-  const struct = Services.UpdateFollowers.struct;
   const repeatList = () => {
     const options = {
       user_id: userID,
@@ -262,20 +266,19 @@ Services.UpdateFollowers.getFollowers.getList = (client, userID, callback) => {
     client.get('followers/list', options, (err, data) => {
       if (err) throw err;
 
-      const followerList = struct.followers;
-      struct.followers = followerList.concat(data.users);
+      const followerList = newStruct.followers;
+      newStruct.followers = followerList.concat(data.users);
       cursor = data.next_cursor_str;
 
       // Checks to see if there's no more pages of followers left
-      if (parseInt(cursor, 10) === 0) callback(struct.followers);
+      if (parseInt(cursor, 10) === 0) callback(newStruct.followers, newStruct);
       else repeatList();
     });
   };
   repeatList();
 };
 
-Services.UpdateFollowers.metaFollowerSort = (doc, callback) => {
-  const struct = Services.UpdateFollowers.struct;
+Services.UpdateFollowersData.metaFollowerSort = (doc, struct, callback) => {
   const NewFollowers = struct.followers.map((item) => {
     if (item.id_str) return item.id_str;
     return null;
@@ -288,74 +291,79 @@ Services.UpdateFollowers.metaFollowerSort = (doc, callback) => {
   const unfollowerIDs = arrayDiff(OldFollowers, NewFollowers);
   const newFollowerIDs = arrayDiff(NewFollowers, OldFollowers);
 
-  Services.UpdateFollowers.createMeta(unfollowerIDs, newFollowerIDs, doc,
-  (followerList, unfollowerList) => {
-    callback(followerList, unfollowerList, newFollowerIDs.length, unfollowerIDs.length);
+  Services.UpdateFollowersData.createMeta(unfollowerIDs, newFollowerIDs, doc, struct,
+  (followerList, unfollowerList, newStruct) => {
+    callback(followerList, unfollowerList, newFollowerIDs.length, unfollowerIDs.length, newStruct);
   });
 };
 
-Services.UpdateFollowers.createMeta = (unfollowerIDs, newFollowerIDs, doc, callback) => {
-  const followerList = Services.UpdateFollowers.followers.map((item) => {
-    Services.UpdateFollowers.filterUserData(item, (user) => {
+Services.UpdateFollowersData.createMeta = (unfollowerIDs, newFollowerIDs, doc, struct, callback) => {
+  const followerList = struct.followers.map((item) => {
+    let $item;
+    Services.UpdateFollowersData.filterUserData(item, (user) => {
       const $this = user;
-      $this.metadata = {};
+      if (!$this.metadata) $this.metadata = {};
       if (newFollowerIDs.indexOf(item.id_str) >= 0) {
         $this.metadata.new_follower = true;
         $this.metadata.followed_at = (new Date()).toString();
         $this.metadata.unfollower = false;
+        $item = $this;
         return $this;
       }
       $this.metadata.unfollower = false;
       $this.metadata.new_follower = false;
+      $item = $this;
       return $this;
     });
-    return null;
+    return $item;
   });
   const unfollowerList = doc.followers.filter((item) => {
+    let $item = null;
     if (unfollowerIDs.indexOf(item.id_str) >= 0) {
-      Services.UpdateFollowers.filterUserData(item, (user) => {
+      Services.UpdateFollowersData.filterUserData(item, (user) => {
         const $this = user;
-        $this.metadata = {};
+        if (!$this.metadata) $this.metadata = {};
         $this.metadata.unfollower = true;
         $this.metadata.new_follower = false;
         $this.metadata.unfollowed_at = (new Date()).toString();
+        $item = $this;
         return $this;
       });
     }
-    return null;
+    return $item;
   });
-  callback(followerList, unfollowerList);
+  callback(followerList, unfollowerList, struct);
 };
 
-Services.UpdateFollowers.followSort = (doc, collectionObject, callback) => {
-  const struct = Services.UpdateFollowers.struct;
-  const userID = Services.UpdateFollowers.struct.user_id;
-  Services.UpdateFollowers.metaFollowerSort(doc, (followerList, unfollowerList,
-    newFollowerIDs, unfollowerIDs) => {
-    struct.counts.new_followers = newFollowerIDs;
-    struct.counts.unfollowers = unfollowerIDs;
-    struct.unfollowers = unfollowerList;
-    struct.followers = followerList;
-    collectionObject.findOneAndUpdate({ user_id: userID }, { $set: struct }, (err, response) => {
+Services.UpdateFollowersData.followSort = (doc, struct, collectionObject, callback) => {
+  const userID = struct.user_id;
+  Services.UpdateFollowersData.metaFollowerSort(doc, struct, (followerList, unfollowerList,
+    newFollowerIDs, unfollowerIDs, newStruct) => {
+    newStruct.counts.new_followers = newFollowerIDs;
+    newStruct.counts.unfollowers = unfollowerIDs;
+    newStruct.unfollowers = unfollowerList;
+    newStruct.followers = followerList;
+    collectionObject.findOneAndUpdate({ user_id: userID }, { $set: newStruct }, (err, response) => {
       if (err) throw err;
-      callback(struct, response);
+      callback(newStruct, response);
     });
   });
 };
 
-Services.UpdateFollowers.followSortNew = (collectionObject, callback) => {
-  const struct = Services.UpdateFollowers.struct;
-  const metaList = (struct.followers.map((item) => {
-    Services.UpdateFollowers.filterUserData(item, (user) => {
+Services.UpdateFollowersData.followSortNew = (collectionObject, struct, callback) => {
+  const metaList = struct.followers.map((item) => {
+    let $item;
+    Services.UpdateFollowersData.filterUserData(item, (user) => {
       const $this = user;
-      $this.metadata = {};
+      if (!$this.metadata) $this.metadata = {};
       $this.metadata.unfollower = false;
-      $this.metadata.new_follower = false;
+      $this.metadata.new_follower = true;
       $this.metadata.followed_at = (new Date()).toString();
+      $item = $this;
       return $this;
     });
-    return undefined;
-  }));
+    return $item;
+  });
   struct.followers = metaList;
   struct.counts.unfollowers = 0;
   struct.counts.new_followers = 0;
@@ -372,15 +380,18 @@ Services.UpdateFollowers = (userID, token, secret, callback) => {
     access_token_key: token,
     access_token_secret: secret
   });
-  const struct = Services.UpdateFollowers.struct;
+  const struct = (new Services.UpdateFollowersData.Struct()).struct;
   struct.user_id = userID;
 
   // Use connect method to connect to the server
-  Services.UpdateFollowers.DBHandler({ user_id: userID }, (doc, collectionObject) => {
-    Services.UpdateFollowers.getFollowers(client, userID, () => {
-      if (doc) Services.UpdateFollowers.followSort(doc, collectionObject, () => callback());
-      else {
-        Services.UpdateFollowers.followSortNew(collectionObject, collectionObject, () => {
+  Services.UpdateFollowersData.DBHandler({ user_id: userID }, (doc, collectionObject) => {
+    Services.UpdateFollowersData.getFollowers(client, struct, userID, (followerList, newStruct) => {
+      if (doc) {
+        Services.UpdateFollowersData.followSort(doc, newStruct, collectionObject, () => {
+          callback();
+        });
+      } else {
+        Services.UpdateFollowersData.followSortNew(collectionObject, newStruct, () => {
           callback();
         });
       }
