@@ -1,4 +1,4 @@
-# ![AmpTweet](https://user-images.githubusercontent.com/5000732/33108638-4c08aa4c-cf0b-11e7-8b71-6589a7d1ddbc.png) [![Build Status](https://www.bitrise.io/app/dbbcddd2536e0248/status.svg?token=cw7O2wKQdMdSWbrcdbo3jw)](https://www.bitrise.io/app/dbbcddd2536e0248) [![build status](https://gitlab.com/amptweet/amptweet-web/badges/master/build.svg)](https://gitlab.com/amptweet/amptweet-web/commits/master)
+# ![AmpTweet](https://f000.backblazeb2.com/file/brand-assets/Logotype_Black.png)&nbsp;&nbsp;&nbsp;[![Build Status](https://www.bitrise.io/app/dbbcddd2536e0248/status.svg?token=cw7O2wKQdMdSWbrcdbo3jw)](https://www.bitrise.io/app/dbbcddd2536e0248) [![build status](https://gitlab.com/amptweet/amptweet-web/badges/master/build.svg)](https://gitlab.com/amptweet/amptweet-web/commits/master)
 
 AmpTweet is a project made to bring a high standard of Twitter management to the public ― free!
 
