@@ -48,15 +48,8 @@ Mirroring the project on GitHub allows for using CI and deployment services not 
 This reduces the costs necessary to maintain the project and keeps it free.
 
 ### How?
-The project is being mirrored using a proprietary Node.js package created by @ciolt which uses GitLab webhooks to do a one-directional sync to GitHub.
+The project is being mirrored using a proprietary (TODO: make this open source) Node.js package created by @ciolt which uses GitLab webhooks to do a one-directional sync to GitHub.
 A bi-directional sync may be considered in the future, but is not necessary as of right now.
-GitLab's remote repository push feature is too slow and a faster, more reliable method was needed.
-
-### Note about branches
-
-Branching works really weirdly with the mirror on GitHub.
-It's quite wonky, not recommended to use branches.
-Consider a merge request into the master branch instead.
 
 ## License
 
